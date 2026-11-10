@@ -1,6 +1,7 @@
 .venv/
 .tools/
 .work/
+.local/
 state/
 __pycache__/
 *.py[cod]

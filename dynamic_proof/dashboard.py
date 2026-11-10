@@ -96,10 +96,11 @@ def make_server(store, labs, config, port):
                 self._json(404, {"error": "risorsa non trovata"})
 
         def _report(self, filename):
-            if re.fullmatch(r"[0-9]{6,}\.(md|json)", filename):
+            if re.fullmatch(r"[0-9]{6,}\.(md|json|tex)", filename):
                 file = store.path.parent / "reports" / filename
                 if file.is_file():
-                    mime = "text/markdown; charset=utf-8" if file.suffix == ".md" else "application/json; charset=utf-8"
+                    mime = {".md": "text/markdown", ".json": "application/json", ".tex": "text/plain"}[file.suffix]
+                    mime += "; charset=utf-8"
                     self._reply(200, file.read_bytes(), mime, f'attachment; filename="dynamic-proof-{filename}"')
                     return
             self._json(404, {"error": "rapporto assente"})

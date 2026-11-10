@@ -65,6 +65,9 @@ def external_search(query: str) -> list[dict]:
                      _crossref),
         "arXiv": ("https://export.arxiv.org/api/query?" +
                   urlencode({"search_query": arxiv_query, "max_results": 5}), _arxiv),
+        "INSPIRE-HEP": ("https://inspirehep.net/api/literature?" +
+                        urlencode({"q": " OR ".join(f'"{phrase}"' for phrase in phrases), "size": 5,
+                                   "fields": "titles,dois,arxiv_eprints,control_number"}), _inspire),
     }
     records = []
     for name, (url, parser) in adapters.items():
@@ -90,6 +93,20 @@ def _arxiv(payload: bytes) -> list[dict]:
     return [{"title": " ".join(entry.findtext("a:title", "", ns).split()),
              "url": entry.findtext("a:id", "", ns), "abstract": entry.findtext("a:summary", "", ns)}
             for entry in feed.findall("a:entry", ns)]
+
+
+def _inspire(payload: bytes) -> list[dict]:
+    result = []
+    for hit in json.loads(payload)["hits"]["hits"]:
+        record = hit["metadata"]
+        identifier = record.get("control_number", hit.get("id"))
+        title = next((item["title"] for item in record.get("titles", []) if item.get("title")), "")
+        doi = next((item["value"] for item in record.get("dois", []) if item.get("value")), None)
+        arxiv = next((item["value"] for item in record.get("arxiv_eprints", []) if item.get("value")), None)
+        if str(identifier).isdigit() and title:
+            result.append({"title": title, "doi": doi, "arxiv": arxiv,
+                           "url": f"https://inspirehep.net/literature/{identifier}"})
+    return result
 
 
 def local_search(query: str, sources: list[dict]) -> list[dict]:

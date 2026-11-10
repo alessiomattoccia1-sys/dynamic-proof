@@ -1,0 +1,12 @@
+{
+  "id": "PT-007",
+  "title": "Vincolo esatto su due cariche scalari per n dispari",
+  "type": "proof",
+  "theorem": "two_scalar_labels",
+  "fermions": 9,
+  "charge_bound": 12,
+  "anomalies": ["linear"],
+  "strict_chirality": false,
+  "primitive": false,
+  "references": ["particle.berryman2016"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "PT-008",
+  "title": "Verifica finita dell'assenza di modelli strettamente chirali con quattro fermioni",
+  "type": "classification",
+  "fermions": 4,
+  "charge_bound": 9,
+  "method": "enumeration",
+  "completeness": "exhaustive"
+}

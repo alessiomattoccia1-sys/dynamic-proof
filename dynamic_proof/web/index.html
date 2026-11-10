@@ -29,7 +29,7 @@
     <div>
       <p class="eyebrow">CONSOLE DI RICERCA · REGISTRO LOCALE</p>
       <h1 id="intro-title">Ricerca deduttiva</h1>
-      <p class="lede">Segui esperimenti, ipotesi e verifiche dei tre laboratori. Ogni risultato conserva il suo dominio, il procedimento e le fonti.</p>
+      <p class="lede">Consulta esperimenti, ipotesi e verifiche dei laboratori Dynamic Proof.</p>
     </div>
     <div class="connection" aria-live="polite"><span class="indicator" id="runner-dot"></span><div><strong id="runner-status">Connessione al Core</strong><span id="runner-note">Lettura del registro…</span></div></div>
   </section>
@@ -44,11 +44,21 @@
   </section>
 
   <section id="laboratori" class="section">
-    <div class="section-head"><div><p class="eyebrow">01 / LABORATORI</p><h2>Tre code, un nucleo</h2></div><span id="active-label" class="pill neutral">In lettura</span></div>
+    <div class="section-head"><h2>Laboratori</h2><span id="active-label" class="pill neutral">In lettura</span></div>
     <div id="labs" class="labs"></div>
     <div class="operating">
       <div class="panel"><h3>Esperimento in corso</h3><p id="active-run" class="muted">Lettura della coda…</p><p id="active-detail" class="small muted"></p></div>
       <div class="panel"><h3>Risorse e verificatori</h3><p id="limits" class="muted">Lettura dei limiti…</p><p id="consumption" class="small muted"></p></div>
+    </div>
+  </section>
+
+  <section id="particle-theory" class="section" hidden>
+    <div class="section-head"><h2>Particle Theory</h2><span id="particle-active" class="pill neutral"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Problema</th><th scope="col">Esito</th><th scope="col">Unità esaminate</th><th scope="col">Classi</th><th scope="col">Escluse</th><th scope="col">Letteratura</th><th scope="col">Evidenza</th></tr></thead>
+        <tbody id="particle-runs"></tbody>
+      </table>
     </div>
   </section>
 

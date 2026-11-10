@@ -68,3 +68,4 @@ class Lab:
     seeds: tuple[Work, ...]
     coverage_target: str | None = None
     coverage_options: tuple[str, ...] = field(default_factory=tuple)
+    submit: Callable[[dict], Work] | None = None

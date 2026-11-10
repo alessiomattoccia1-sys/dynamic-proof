@@ -228,7 +228,7 @@ class Store:
                 conn.execute("UPDATE jobs SET status='queued',available=? WHERE id=?", (now, row["job"]))
                 self._event(conn, "checkpoint_recovered", {"job": row["job"]}, attempt=row["id"])
 
-    def next_job(self, daily_limit: int) -> dict | None:
+    def next_job(self, daily_limit: int, lab: str | None = None) -> dict | None:
         now = time.time()
         with self.connection(write=True) as conn:
             if conn.execute("SELECT value FROM settings WHERE key='control'").fetchone()[0] != "running":
@@ -238,13 +238,13 @@ class Store:
                 return None
             row = conn.execute("""
                 SELECT jobs.* FROM jobs
-                WHERE status='queued' AND available<=?
+                WHERE status='queued' AND available<=? AND (? IS NULL OR lab=?)
                 ORDER BY COALESCE((
                     SELECT MAX(attempts.started) FROM attempts JOIN jobs AS prior ON prior.id=attempts.job
                     WHERE prior.lab=jobs.lab
                 ),0), (priority + MIN((?-created)/120,20) - 3*attempts) DESC, created, id
                 LIMIT 1
-            """, (now, now)).fetchone()
+            """, (now, lab, lab, now)).fetchone()
             if not row:
                 return None
             conn.execute("UPDATE jobs SET status='running',attempts=attempts+1 WHERE id=?", (row["id"],))
@@ -332,11 +332,15 @@ class Store:
             counts = [dict(row) for row in conn.execute(
                 "SELECT lab,status,count(*) AS count FROM jobs GROUP BY lab,status")]
             active = [dict(row) for row in conn.execute("""
-                SELECT attempts.id,started,stage,lab,strategy FROM attempts JOIN jobs ON job=jobs.id
+                SELECT attempts.id,started,stage,lab,strategy,
+                       COALESCE(json_extract(payload,'$.problem.id'), json_extract(payload,'$.example')) AS problem
+                FROM attempts JOIN jobs ON job=jobs.id
                 WHERE ended IS NULL
             """)]
             runs = [dict(row) for row in conn.execute("""
-                SELECT attempts.*,lab,strategy FROM attempts JOIN jobs ON job=jobs.id
+                SELECT attempts.*,lab,strategy,json_extract(artifacts.data,'$.detail.summary') AS summary,
+                       COALESCE(json_extract(payload,'$.problem.id'), json_extract(payload,'$.example')) AS problem
+                FROM attempts JOIN jobs ON job=jobs.id LEFT JOIN artifacts ON attempts.artifact=artifacts.id
                 ORDER BY attempts.id DESC LIMIT 50
             """)]
             claims = [json.loads(row["data"]) | {"quarantine": row["reason"]} for row in conn.execute("""
@@ -353,6 +357,7 @@ class Store:
                       "evidence": dict(conn.execute("SELECT kind,count(*) FROM claims GROUP BY kind"))}
         for row in runs:
             row["stats"] = json.loads(row["stats"]) if row["stats"] else None
+            row["summary"] = json.loads(row["summary"]) if row["summary"] else None
         for claim in claims:
             claim["refuted_by"] = refutations.get(claim["id"], [])
         return {"generated": datetime.now(timezone.utc).isoformat(), "settings": settings,

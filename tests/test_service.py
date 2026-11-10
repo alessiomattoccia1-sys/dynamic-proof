@@ -42,7 +42,7 @@ class LiveService(unittest.TestCase):
         store = Store(self.state / "research.sqlite3")
         snapshot = store.snapshot()
         reproduced = {attempt["lab"] for attempt in snapshot["runs"] if attempt["status"] == "reproduced"}
-        self.assertEqual(reproduced, {"riemann", "strings", "tmf"})
+        self.assertEqual(reproduced, {"riemann", "strings", "tmf", "particle_theory"})
         failures = [store.artifact(row["artifact"]) for row in snapshot["runs"] if row["status"] == "failed"]
         self.assertEqual(failures, [])
         self.assertTrue(store.claim("tmf.mean_connection.identity")["refuted_by"])
@@ -65,7 +65,7 @@ class LiveService(unittest.TestCase):
             else:
                 self.fail("dashboard non raggiungibile")
             self.assertEqual(status["settings"]["control"], "paused")
-            self.assertEqual(len(status["labs"]), 3)
+            self.assertEqual({lab["id"] for lab in status["labs"]}, {"riemann", "strings", "tmf", "particle_theory"})
             coverage = self.read_json(base + "/api/coverage/riemann?include=riemann.hertlein1")
             self.assertIn(str(2**20), " ".join(coverage["display"]["hypotheses"]))
             with self.assertRaises(HTTPError) as invalid:
@@ -111,7 +111,7 @@ class LiveService(unittest.TestCase):
                 process.kill()
                 process.wait(timeout=4)
         self.assertEqual(len(store.snapshot()["active"]), 1)
-        result = subprocess.run([*self.cmd, "run", "--cycles", "3"], cwd=ROOT, capture_output=True,
+        result = subprocess.run([*self.cmd, "run", "--cycles", str(len(LABS))], cwd=ROOT, capture_output=True,
                                 text=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
         attempts = store.snapshot()["runs"]

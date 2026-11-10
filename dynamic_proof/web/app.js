@@ -12,7 +12,13 @@ const labels = {
 const runLabels = {
   running: ["In corso", "green"], reproduced: ["Riprodotto", "green"], partial: ["Parziale", "blue"],
   refuted: ["Confutato", "red"], inconclusive: ["Inconcludente", "amber"],
-  interrupted: ["Interrotto", "neutral"], failed: ["Errore", "red"]
+  interrupted: ["Interrotto", "neutral"], failed: ["Errore", "red"], verified: ["Verificato", "green"]
+};
+const problemLabels = {
+  SAT: "Soluzioni trovate", UNSAT: "Nessuna soluzione nel dominio", UNKNOWN: "Ricerca incompleta",
+  checkpoint: "Checkpoint", budget_exhausted: "Budget esaurito", proved: "Dimostrato in Lean",
+  proof_obligation: "Verifica Lean aperta", analytic_derivation: "Derivazione analitica",
+  counterexample: "Controesempio verificato", counterexample_absent: "Nessun controesempio nel dominio"
 };
 
 const byId = (id) => document.getElementById(id);
@@ -69,7 +75,8 @@ function renderStats() {
   const active = state.active[0];
   const labName = state.labs.find((lab) => lab.id === active?.lab)?.title;
   text("active-label", active ? "Ciclo attivo" : "In attesa");
-  text("active-run", active ? labName + " · " + shortStrategy(active.strategy) : "Nessun esperimento in esecuzione");
+  text("active-run", active ? (labName || active.lab) + " · " + (active.problem || shortStrategy(active.strategy)) :
+    "Nessun esperimento in esecuzione");
   text("active-detail", active ? "Fase " + active.stage + " · avviato alle " + formatTime(active.started) : "Le code e i tentativi precedenti restano nel registro.");
   const {wall_seconds: wall, cpu_seconds: cpu, memory_mb: mem, max_jobs_per_day: daily} = state.limits;
   text("limits", "Limiti per esperimento · " + wall + " s durata · " + cpu + " s CPU · " + mem + " MiB RAM");
@@ -200,7 +207,8 @@ function renderRuns() {
       data.href = "/api/report/" + number + ".json";
       report.append(md, document.createTextNode(" · "), data);
     }
-    tr.append(node("td", "#" + run.id), node("td", run.lab), node("td", shortStrategy(run.strategy)),
+    tr.append(node("td", "#" + run.id), node("td", run.lab),
+      node("td", run.summary?.problem || run.problem || shortStrategy(run.strategy)),
       status, node("td", timing), report);
     rows.push(tr);
   }
@@ -208,6 +216,118 @@ function renderRuns() {
   byId("events").replaceChildren(...state.events.slice(0, 28).map((event) =>
     node("li", [formatTime(event.at), event.lab, event.action, event.detail.detail || event.detail.strategy]
       .filter(Boolean).join(" · "))));
+}
+
+function renderParticle() {
+  const section = byId("particle-theory");
+  section.hidden = !state.labs.some((lab) => lab.id === "particle_theory");
+  if (section.hidden) return;
+  const active = state.active.find((run) => run.lab === "particle_theory");
+  text("particle-active", active ? (active.problem || "Ricerca attiva") + " · " + active.stage : "Registro consultabile");
+  const latest = new Map();
+  for (const run of state.runs) {
+    const problem = run.summary?.problem || run.problem;
+    if (run.lab === "particle_theory" && run.artifact && problem && !latest.has(problem)) {
+      latest.set(problem, run);
+    }
+  }
+  const rows = [];
+  for (const [problem, run] of latest) {
+    const data = run.summary || {outcome: run.status};
+    const tr = node("tr");
+    const view = node("button", "Apri " + problem);
+    view.type = "button";
+    view.onclick = () => openParticleRun(run);
+    const control = node("td");
+    control.append(view);
+    tr.append(node("td", problem), node("td", problemLabels[data.outcome] || runLabels[data.outcome]?.[0] || data.outcome),
+      node("td", data.examined === undefined ? "—" : data.examined + " / " + data.total, "progress-count"),
+      node("td", data.models ?? "—"), node("td", data.excluded ?? "—"), node("td", data.literature || "—"), control);
+    rows.push(tr);
+  }
+  if (!rows.length) {
+    const empty = node("tr");
+    const cell = node("td", "Gli esiti compaiono al primo checkpoint.");
+    cell.colSpan = 7;
+    empty.append(cell);
+    rows.push(empty);
+  }
+  byId("particle-runs").replaceChildren(...rows);
+}
+
+function massMatrix(container, mass) {
+  if (!mass?.matrix) return;
+  container.append(node("h3", "Matrice delle masse"),
+    node("p", "q = (" + mass.fermion_charges.join(", ") + ") · h = (" + mass.scalar_charges.join(", ") + ")", "math"));
+  const table = node("table");
+  table.setAttribute("aria-label", "Matrice simmetrica di Yukawa");
+  for (const cells of mass.matrix) {
+    const row = node("tr");
+    row.append(...cells.map((cell) => node("td", cell)));
+    table.append(row);
+  }
+  const frame = node("div", undefined, "table-wrap mass-matrix");
+  frame.append(table);
+  container.append(frame, node("p", "det M = " + mass.determinant + " · rango generico " + mass.generic_rank +
+    " · determinante del testimone " + mass.witness_determinant, "math"));
+}
+
+async function openParticleRun(run) {
+  try {
+    const artifact = await json("/api/artifact/" + run.artifact);
+    const detail = artifact.detail;
+    const container = byId("dialog-content");
+    container.replaceChildren();
+    text("dialog-title", artifact.title);
+    container.append(pill(runLabels[run.status] || [run.status, "neutral"]));
+    addSection(container, "Esito", problemLabels[detail.outcome] || detail.outcome || detail.reason || artifact.status, "math");
+    if (detail.models?.length) {
+      const list = node("ul");
+      for (const model of detail.models.slice(0, 20)) {
+        list.append(node("li", "(" + model.charges.join(", ") + ") · Σq = " + model.linear_sum +
+          " · Σq³ = " + model.cubic_sum));
+      }
+      container.append(node("h3", "Classi di carica"), list);
+    }
+    if (detail.proof) {
+      const list = node("ol");
+      list.append(...detail.proof.map((step) => node("li", step)));
+      container.append(node("h3", "Dimostrazione"), list);
+    }
+    if (detail.alternative_proof) {
+      const second = node("details");
+      const steps = node("ol");
+      steps.append(...detail.alternative_proof.map((step) => node("li", step)));
+      second.append(node("summary", "Seconda dimostrazione"), steps);
+      container.append(second);
+    }
+    if (detail.lean) addSection(container, "Controllo del kernel", detail.lean.status, "math");
+    if (detail.formal_obligation) addSection(container, "Obbligo di prova", detail.formal_obligation);
+    if (detail.counterexample?.mass) massMatrix(container, detail.counterexample.mass);
+    for (const result of (detail.mass_searches || []).slice(0, 10)) massMatrix(container, result.certificate);
+    for (const claim of artifact.claims || []) {
+      const button = node("button", claim.title);
+      button.type = "button";
+      button.onclick = () => openClaim(claim.id);
+      container.append(button);
+    }
+    if (artifact.novelty) addSection(container, "Valutazione bibliografica", artifact.novelty.meaning);
+    const number = String(run.id).padStart(6, "0");
+    const download = node("a", "Rapporto JSON completo");
+    download.href = "/api/report/" + number + ".json";
+    const files = node("p");
+    files.append(download);
+    if (artifact.substantive && artifact.proof_complete && detail.dossier) {
+      const draft = node("a", "Bozza LaTeX");
+      draft.href = "/api/report/" + number + ".tex";
+      files.append(document.createTextNode(" · "), draft);
+    }
+    container.append(files);
+    if (!byId("claim-dialog").open) byId("claim-dialog").showModal();
+    byId("claim-dialog").scrollTop = 0;
+  } catch (error) {
+    notice(error.message);
+  }
 }
 
 function addSection(container, title, value, css) {
@@ -266,6 +386,7 @@ async function openClaim(id) {
       container.append(node("h3", "Fonti"), list);
     }
     graph(container, item);
+    massMatrix(container, item.evidence?.mass);
     if (item.evidence?.artifact && /^[a-f0-9]{64}$/.test(item.evidence.artifact)) {
       const artifact = node("a", "Apri il rapporto di verifica e novità");
       artifact.href = "/api/artifact/" + item.evidence.artifact;
@@ -296,6 +417,7 @@ async function refresh() {
       renderLabs();
       renderClaims();
       renderRuns();
+      renderParticle();
       renderSignature = signature;
     }
     await renderCoverage();

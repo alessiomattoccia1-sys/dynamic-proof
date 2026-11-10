@@ -1,0 +1,9 @@
+{
+  "id": "PT-009",
+  "title": "Classificazione con sette fermioni e cariche fino a 12",
+  "type": "classification",
+  "fermions": 7,
+  "charge_bound": 12,
+  "method": "quadratic",
+  "budget": {"verification_steps": 500000}
+}

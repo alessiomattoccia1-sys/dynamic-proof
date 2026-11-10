@@ -1,0 +1,13 @@
+{
+  "id": "PT-003",
+  "title": "Ostruzione universale per n dispari e cariche scalari di uguale valutazione 2-adica",
+  "type": "proof",
+  "theorem": "odd_scalar_valuation",
+  "fermions": 5,
+  "charge_bound": 6,
+  "anomalies": ["linear"],
+  "strict_chirality": false,
+  "primitive": false,
+  "budget": {"scalar_sets": 20000},
+  "references": ["particle.berryman2016"]
+}

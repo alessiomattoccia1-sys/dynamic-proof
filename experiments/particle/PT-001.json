@@ -1,0 +1,14 @@
+{
+  "id": "PT-001",
+  "title": "Baseline chirale con cinque fermioni e cariche fino a 9",
+  "type": "classification",
+  "fermions": 5,
+  "charge_bound": 9,
+  "anomalies": ["linear", "cubic"],
+  "strict_chirality": true,
+  "primitive": true,
+  "method": "enumeration",
+  "completeness": "exhaustive",
+  "budget": {"steps_per_cycle": 10000, "max_steps": 26334},
+  "references": ["particle.costa2019", "particle.costa2020"]
+}

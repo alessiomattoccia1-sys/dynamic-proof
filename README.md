@@ -11,6 +11,7 @@ Motore locale di ricerca deduttiva con registro SQLite, orchestratore persistent
 | Riemann e teoria dei numeri | Criterio di Robin, riduzione per divisibilità, controlli finiti con Arb e zeri indicizzati della zeta. |
 | Teoria delle stringhe | Integrale toroidale di genere uno, dualità T, termine costante e proiezioni modulari. |
 | TMF · Geometria multiscala | Connessioni di Levi-Civita, controesempio DPR-003, riduzione monoscala e azioni con pesi variabili. |
+| Particle Theory | Anomalie locali U(1), equivalenze chirali, rango delle masse Yukawa e teorema di parità in Lean. [Guida](docs/particle_theory/README.md) |
 
 La TMF è trattata come teoria candidata. Le verifiche di Robin sono riferite ai domini dei singoli rapporti. L’ipotesi di Riemann resta aperta. [Pagina del motore e rapporti](https://mattoccia.com/dynamics-lab/dynamic-proof/) · [Clay Mathematics Institute](https://www.claymath.org/millennium/riemann-hypothesis/)
 
@@ -24,7 +25,7 @@ python3.12 -m venv .venv
 .venv/bin/python -m dynamic_proof serve
 ~~~
 
-Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore crea `state/`, registra i tre laboratori e comincia i calcoli. `Ctrl+C` interrompe il processo. La ripresa usa lo stesso registro.
+Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore crea `state/`, registra i quattro laboratori e comincia i calcoli. `Ctrl+C` interrompe il processo. La ripresa usa lo stesso registro.
 
 ~~~sh
 .venv/bin/python -m dynamic_proof status
@@ -33,14 +34,18 @@ Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore cre
 .venv/bin/python -m dynamic_proof control stopped
 ~~~
 
-`config.toml` controlla il budget per esperimento, la cadenza, la porta e le ricerche bibliografiche. La configurazione distribuita usa il catalogo locale. `online_literature = true` abilita interrogazioni pubbliche su arXiv e Crossref con i termini dei laboratori. Per avviare un registro separato, usa `--state` prima del sottocomando.
+`config.toml` controlla il budget per esperimento, la cadenza, la porta e le ricerche bibliografiche. La configurazione distribuita usa il catalogo locale. `online_literature = true` abilita interrogazioni pubbliche su arXiv, Crossref e INSPIRE-HEP con i termini dei laboratori. Per avviare un registro separato, usa `--state` prima del sottocomando.
 
 ~~~sh
 .venv/bin/python -m dynamic_proof --state .work/demo run --cycles 8
 .venv/bin/python -m dynamic_proof queue riemann sources/example-statement.json
+.venv/bin/python -m dynamic_proof --state .local/particle-research init --lab particle_theory
+.venv/bin/python -m dynamic_proof --state .local/particle-research run --lab particle_theory --cycles 30
 ~~~
 
 Il comando `queue` accetta enunciati strutturati. Nel frammento lineare intero il motore usa SMT per cercare controesempi e, con Lean configurato, tenta la verifica formale. La modalità `relax` propone varianti che rimuovono un’ipotesi per volta. Su macOS è disponibile il servizio facoltativo `.venv/bin/python scripts/macos_service.py install`, con log nel registro della copia che lo installa.
+
+`init`, `run` e `serve` accettano `--lab` per selezionare una coda. Il comando `submit particle_theory FILE.json` accoda un problema specialistico nello stesso Runner. [Schema e comandi Particle Theory](docs/particle_theory/README.md)
 
 ## Riproduzione e test
 
@@ -59,7 +64,7 @@ Posiziona Lean **4.33.1** con `bin/lean` e `bin/lake` in `.tools/lean` oppure co
 
 ~~~sh
 cd proofs
-PATH="$PWD/../.tools/lean/bin:$PATH" lake exe cache get Mathlib.Tactic.Ring Mathlib.Tactic.NormNum Mathlib.Data.Rat.Defs
+PATH="$PWD/../.tools/lean/bin:$PATH" lake exe cache get Mathlib.Tactic.Ring Mathlib.Tactic.NormNum Mathlib.Data.Rat.Defs Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 cd ..
 .venv/bin/python -m unittest discover -s tests -v
 ~~~

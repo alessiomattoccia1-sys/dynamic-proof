@@ -73,7 +73,7 @@ nav a:hover { color: var(--ink); }
 .section { margin-top: 2.3rem; scroll-margin-top: 1rem; }
 .section-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: .55rem; margin-bottom: .88rem; }
 .section-head .eyebrow { margin-bottom: .26rem; }
-.labs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.labs { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .lab { padding: 1.05rem; display: grid; align-content: start; gap: .55rem; }
 .lab-tag { font: 700 .68rem ui-monospace, monospace; color: var(--accent); letter-spacing: .09em; }
 .lab p { min-height: 3.15rem; font-size: .85rem; color: var(--muted); }
@@ -127,6 +127,10 @@ dialog::backdrop { background: #060d16cc; }
 #dialog-content ul { margin: .3rem 0; padding-left: 1.3rem; font-size: .87rem; }
 pre { max-height: 310px; overflow: auto; border-radius: 8px; border: 1px solid var(--border);
   background: var(--canvas); padding: .8rem; font-size: .76rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mass-matrix { margin: .55rem 0; }
+.mass-matrix table { width: max-content; font-family: ui-monospace, monospace; }
+.mass-matrix td { text-align: center; min-width: 2.3rem; }
+.progress-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .graph { padding: .6rem; border: 1px solid var(--border); border-radius: 8px; background: #101b27; }
 .graph-parents { display: flex; flex-wrap: wrap; gap: .4rem; }
 .graph-parents button { font-size: .78rem; text-align: left; }

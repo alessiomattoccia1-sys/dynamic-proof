@@ -1,0 +1,13 @@
+{
+  "id": "PT-005",
+  "title": "Classificazione chirale con massa piena e scalari di piccola carica",
+  "type": "classification",
+  "fermions": 5,
+  "charge_bound": 14,
+  "scalar_charges": [1, 2, 3, 4, 5, 6],
+  "max_scalars": 2,
+  "mass_condition": "full_rank",
+  "method": "quadratic",
+  "completeness": "exhaustive",
+  "references": ["particle.berryman2016"]
+}

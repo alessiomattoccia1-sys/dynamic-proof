@@ -1,0 +1,12 @@
+{
+  "id": "PT-010",
+  "title": "Masse con uno scalare nel settore pari a sei fermioni",
+  "type": "classification",
+  "fermions": 6,
+  "charge_bound": 12,
+  "max_scalars": 1,
+  "mass_condition": "full_rank",
+  "method": "quadratic",
+  "completeness": "exhaustive",
+  "references": ["particle.berryman2016"]
+}

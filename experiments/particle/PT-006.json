@@ -1,0 +1,11 @@
+{
+  "id": "PT-006",
+  "title": "Ricerca di una confutazione del criterio aritmetico di massa",
+  "type": "counterexample",
+  "fermions": 5,
+  "charge_bound": 9,
+  "scalar_charges": [3, 6],
+  "max_scalars": 2,
+  "completeness": "witness",
+  "references": ["particle.berryman2016"]
+}

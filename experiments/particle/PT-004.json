@@ -1,0 +1,10 @@
+{
+  "id": "PT-004",
+  "title": "Classificazione con sei fermioni e cariche fino a 12",
+  "type": "classification",
+  "fermions": 6,
+  "charge_bound": 12,
+  "method": "quadratic",
+  "budget": {"steps_per_cycle": 7500},
+  "references": ["particle.batra2006"]
+}

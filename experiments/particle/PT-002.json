@@ -1,0 +1,12 @@
+{
+  "id": "PT-002",
+  "title": "Minimo di scalari per il modello di riferimento",
+  "type": "construction",
+  "fermions": 5,
+  "charge_bound": 9,
+  "fermion_charges": [-9, -5, -1, 7, 8],
+  "max_scalars": 2,
+  "mass_condition": "full_rank",
+  "completeness": "witness",
+  "references": ["particle.berryman2016"]
+}

@@ -65,7 +65,7 @@ class Runner:
         self.queries = queries or {}
         self.stop = threading.Event()
 
-    def run(self, limit=None):
+    def run(self, limit=None, *, lab=None):
         lock_path = self.store.path.parent / "runner.lock"
         with lock_path.open("a+", encoding="utf-8") as lock:
             try:
@@ -83,12 +83,12 @@ class Runner:
                     self.store.set_setting("heartbeat", time.time())
                     if self.store.setting("control") == "running" and time.monotonic() - last_review > 60:
                         if limit is None:
-                            self._schedule_review()
+                            self._schedule_review(lab)
                         last_review = time.monotonic()
                     if limit is None and time.monotonic() - last_run < self.config.min_job_interval:
                         self.stop.wait(1)
                         continue
-                    job = self.store.next_job(self.config.max_jobs_per_day)
+                    job = self.store.next_job(self.config.max_jobs_per_day, lab)
                     if job is None:
                         if limit is not None:
                             break
@@ -102,7 +102,7 @@ class Runner:
                 self.store.event("runner_exit", {"cycles": completed})
         return completed
 
-    def _schedule_review(self):
+    def _schedule_review(self, selected=None):
         now = datetime.now(timezone.utc)
         # Persistent research includes a low-frequency refresh for each source
         # queue once a week. The dedup key survives crashes and restarts.
@@ -110,7 +110,8 @@ class Runner:
             return
         week = now.strftime("%G-W%V")
         for lab, query in self.queries.items():
-            self.store.enqueue(lab, Work("@literature", {"query": query, "week": week}, 8).data())
+            if selected is None or selected == lab:
+                self.store.enqueue(lab, Work("@literature", {"query": query, "week": week}, 8).data())
 
     def _cycle(self, job):
         started = time.monotonic()

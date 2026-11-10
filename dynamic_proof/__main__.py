@@ -15,7 +15,7 @@ from .core.plugin import Work
 from .core.runner import Runner
 from .core.store import Store
 from .dashboard import make_server
-from .labs.catalog import LABS
+from .labs.catalog import BY_ID, LABS
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +23,7 @@ QUERIES = {
     "riemann": "Robin inequality | Riemann hypothesis | divisor sums",
     "strings": "Rankin Selberg | string theory | horocycle",
     "tmf": "Levi-Civita connections | conformal metrics | averaging",
+    "particle_theory": "chiral U(1) anomaly | Yukawa masses | Abelian Higgs fermions",
 }
 
 
@@ -31,15 +32,20 @@ def main():
     parser.add_argument("--state", type=Path, default=ROOT / "state")
     parser.add_argument("--config", type=Path, default=ROOT / "config.toml")
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("init", help="registra fonti, enunciati e attività iniziali")
+    initialize = commands.add_parser("init", help="registra fonti, enunciati e attività iniziali")
     run = commands.add_parser("run", help="ricerca persistente senza interfaccia")
     run.add_argument("--cycles", type=int, help="limite di tentativi in questa esecuzione")
     serve = commands.add_parser("serve", help="dashboard e ricerca persistente")
     serve.add_argument("--port", type=int)
+    for command in (initialize, run, serve):
+        command.add_argument("--lab", choices=tuple(BY_ID), help="limita il comando a un laboratorio")
     commands.add_parser("status", help="stato JSON del registro")
     queue = commands.add_parser("queue", help="accoda un nuovo enunciato strutturato")
     queue.add_argument("lab", choices=tuple(lab.id for lab in LABS))
     queue.add_argument("file", type=Path)
+    submit = commands.add_parser("submit", help="accoda un problema JSON specialistico")
+    submit.add_argument("lab", choices=tuple(lab.id for lab in LABS if lab.submit))
+    submit.add_argument("file", type=Path)
     transfer = commands.add_parser("transfer", help="trasferisce un risultato con lo stesso dominio e le stesse ipotesi")
     transfer.add_argument("claim")
     transfer.add_argument("lab", choices=tuple(lab.id for lab in LABS))
@@ -58,9 +64,21 @@ def main():
         store.control(args.mode)
         print(args.mode)
         return 0
-    store.register(ROOT, LABS)
+    selected = getattr(args, "lab", None) if args.command in {"init", "run", "serve", "submit"} else None
+    selected_labs = (BY_ID[selected],) if selected else LABS
+    store.register(ROOT, selected_labs)
     if args.command == "init":
         print(f"Registro inizializzato · {store.path}")
+        return 0
+    if args.command == "submit":
+        try:
+            if args.file.stat().st_size > 64 * 1024:
+                raise ValueError("file troppo grande")
+            problem = json.loads(args.file.read_text(encoding="utf-8"))
+            added = store.enqueue(args.lab, BY_ID[args.lab].submit(problem).data())
+        except (ValueError, KeyError, TypeError, RecursionError, OSError) as error:
+            parser.error(str(error))
+        print(f"{problem['id']} · {'in coda' if added else 'già registrato'}")
         return 0
     if args.command == "queue":
         try:
@@ -120,18 +138,18 @@ def main():
             parser.error("--cycles deve essere positivo")
         for sig in (signal.SIGTERM, signal.SIGINT):
             signal.signal(sig, lambda *_: runner.stop.set())
-        completed = runner.run(args.cycles)
+        completed = runner.run(args.cycles, lab=selected)
         print(f"Tentativi terminati · {completed}")
         return 0
 
     if args.port is not None and not 1024 <= args.port <= 65535:
         parser.error("--port deve essere compresa tra 1024 e 65535")
-    http = make_server(store, LABS, config, args.port or port)
+    http = make_server(store, selected_labs, config, args.port or port)
     failed = []
 
     def research_loop():
         try:
-            runner.run()
+            runner.run(lab=selected)
         except Exception as error:
             failed.append(error)
             print(f"Orchestratore interrotto · {error}", flush=True)

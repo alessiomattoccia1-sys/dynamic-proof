@@ -1,0 +1,13 @@
+{
+  "id": "PT-011",
+  "title": "Condizione 4 divisore di n per un solo scalare",
+  "type": "proof",
+  "theorem": "one_scalar_multiple_four",
+  "fermions": 6,
+  "charge_bound": 5,
+  "anomalies": ["linear"],
+  "strict_chirality": false,
+  "primitive": false,
+  "budget": {"scalar_sets": 20000},
+  "references": ["particle.berryman2016"]
+}
