@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """The application registers independent laboratories using this interface."""
 from __future__ import annotations

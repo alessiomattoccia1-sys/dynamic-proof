@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Immutable statements and a typed, serializable fragment for executable mathematics."""
 from __future__ import annotations

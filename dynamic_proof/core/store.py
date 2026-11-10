@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Transactional theorem, evidence and research-memory registries."""
 from __future__ import annotations

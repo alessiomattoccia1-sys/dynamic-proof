@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Exact and certified verification adapters, with reproducible artifacts."""
 from __future__ import annotations

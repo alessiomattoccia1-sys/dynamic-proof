@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Public examples of averaged metrics and variational dynamics at finite scale."""
 from __future__ import annotations

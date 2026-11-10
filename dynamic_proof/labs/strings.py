@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Mathematical string theory laboratory, with explicit scopes for modular results."""
 from __future__ import annotations

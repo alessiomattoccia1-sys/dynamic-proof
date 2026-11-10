@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Research on new structured statements, reusable by every lab."""
 from pathlib import Path

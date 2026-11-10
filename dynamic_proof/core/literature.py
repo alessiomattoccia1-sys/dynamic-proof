@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Provenance records, literature acquisition and conservative novelty assessment."""
 from __future__ import annotations

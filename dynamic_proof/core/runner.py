@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Persistent bounded research cycles with process-group cancellation."""
 from __future__ import annotations

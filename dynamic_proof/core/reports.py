@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Generate durable, human-readable research reports after committed attempts."""
 from datetime import datetime, timezone

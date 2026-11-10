@@ -1,5 +1,7 @@
 # Dynamic Proof Research Engine
 
+Progetto di **Alessio Mattoccia**.
+
 **Dynamics Lab · Engine 03 · v0.1.0**
 
 Motore locale di ricerca deduttiva con registro SQLite, orchestratore persistente e dashboard. Registra domini, ipotesi, provenienza e dipendenze. Combina calcolo simbolico, intervalli certificati, ricerca di controesempi e verifiche formali opzionali.

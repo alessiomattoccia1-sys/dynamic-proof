@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Constraint solving, independently validated witnesses, and coverage deductions."""
 from dataclasses import dataclass

@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Install or remove the local login service for this Dynamic Proof workspace."""
 from argparse import ArgumentParser

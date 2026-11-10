@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Run the Dynamic Proof service or inspect its local research state."""
 from argparse import ArgumentParser

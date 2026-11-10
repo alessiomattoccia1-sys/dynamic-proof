@@ -1,3 +1,4 @@
+# Copyright 2026 Alessio Mattoccia
 # SPDX-License-Identifier: Apache-2.0
 """Number theory laboratory. Domain knowledge stays out of the core."""
 from __future__ import annotations
