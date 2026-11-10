@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+[research]
+wall_seconds = 30
+cpu_seconds = 18
+memory_mb = 3072
+min_job_interval = 15
+max_jobs_per_day = 96
+continue_after_candidate = true
+online_literature = false
+max_retries = 2
+
+[dashboard]
+port = 8791

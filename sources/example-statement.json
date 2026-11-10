@@ -1,0 +1,10 @@
+{
+  "title": "Controllo del ruolo di un’ipotesi aritmetica",
+  "relax": true,
+  "statement": {
+    "binders": [["n", "int", "forall"]],
+    "domain": ["ge", ["var", "n"], ["num", "0"]],
+    "hypotheses": [["ge", ["var", "n"], ["num", "3"]]],
+    "conclusion": ["ge", ["add", ["var", "n"], ["num", "2"]], ["num", "5"]]
+  }
+}

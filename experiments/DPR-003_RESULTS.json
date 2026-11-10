@@ -1,0 +1,28 @@
+{
+  "id": "DPR-003",
+  "evidence": "EXACT_GEOMETRIC_COUNTEREXAMPLE",
+  "completed_at": "2026-11-09T21:59:29.834780+00:00",
+  "domain": "x > -1 on R^2",
+  "metrics": [
+    "diag(1,1)",
+    "diag(1+x,1)"
+  ],
+  "weights": [
+    "1/2",
+    "1/2"
+  ],
+  "mean_metric": "diag(1+x/2,1)",
+  "point_x": "1",
+  "connection_of_mean": "1/6",
+  "mean_of_connections": "1/8",
+  "difference": "1/24",
+  "difference_formula": "x/(4*(x+1)*(x+2))",
+  "scope": "The exact counterexample concerns equality of connections for this two-metric family.",
+  "sources": [
+    {
+      "title": "Dominic Joyce (2006)",
+      "locator": "§1.4, Levi-Civita connection and Koszul formula",
+      "url": "https://people.maths.ox.ac.uk/joyce/RHCGnotes.pdf"
+    }
+  ]
+}

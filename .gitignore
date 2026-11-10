@@ -1,0 +1,11 @@
+.venv/
+.tools/
+.work/
+state/
+__pycache__/
+*.py[cod]
+*.olean
+*.ilean
+
+sources/library/
+proofs/.lake/

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "DPR-003",
+  "engine": "Dynamic Proof Research Engine",
+  "evidence": "EXACT_GEOMETRIC_COUNTEREXAMPLE",
+  "report": "/dynamics-lab/dynamic-proof/dpr-003/",
+  "result": {
+    "url": "/dynamics-lab/dynamic-proof/dpr-003/DPR-003_RESULTS.json",
+    "sha256": "64373419d1bb8e559c1793cbb540d4a32611b085c1006df45ad8910c60c822b4"
+  },
+  "verifier": {
+    "url": "/dynamics-lab/dynamic-proof/verify-dynamic-proof.py.txt",
+    "sha256": "d2cc53e0da4c4fed7a629c18b8488121d46e7ad6768f97282d85845d6e5fa530"
+  },
+  "scope": "The exact counterexample concerns equality of connections for this two-metric family.",
+  "sources": [
+    {
+      "title": "Dominic Joyce (2006)",
+      "locator": "§1.4, Levi-Civita connection and Koszul formula",
+      "url": "https://people.maths.ox.ac.uk/joyce/RHCGnotes.pdf"
+    }
+  ]
+}

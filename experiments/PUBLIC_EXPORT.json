@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "family": "Dynamics Lab",
+  "engine_number": 3,
+  "engine": "Dynamic Proof Research Engine",
+  "url": "/dynamics-lab/dynamic-proof/",
+  "scope": "Public reproductions and one exact geometric example",
+  "experiments": [
+    {
+      "id": "DPR-001",
+      "completed_at": "2026-11-09T21:59:31.294998+00:00",
+      "kind": "CERTIFIED_FINITE_CHECK_AND_PUBLISHED_THEOREM_REDUCTION",
+      "url": "/dynamics-lab/dynamic-proof/dpr-001/",
+      "result": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-001/DPR-001_RESULTS.json",
+        "sha256": "f1245a6b655e8b68680e52f8cce621f20a6d95acfc9239d4cb6a2387b45150ba"
+      },
+      "manifest": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-001/DPR-001_MANIFEST.json",
+        "sha256": "0193090e87fe75279b8583d7e3ac10a52e978ff7bc2117d42d44a3861b99bd2c"
+      }
+    },
+    {
+      "id": "DPR-002",
+      "completed_at": "2026-11-09T22:11:38.523363+00:00",
+      "kind": "EXACT_REFERENCE_REPRODUCTION_AND_CERTIFIED_INTERVAL",
+      "url": "/dynamics-lab/dynamic-proof/dpr-002/",
+      "result": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-002/DPR-002_RESULTS.json",
+        "sha256": "0ae3b0130e1e7e8718ef9392058402a7a9f05fab88bcaf0429e0d6758fd5cbf3"
+      },
+      "manifest": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-002/DPR-002_MANIFEST.json",
+        "sha256": "162f9b3cfd89e69a0d6e8b0bac82955ba4adfc487c62e4c540d3654962be5a37"
+      }
+    },
+    {
+      "id": "DPR-003",
+      "completed_at": "2026-11-09T21:59:29.834780+00:00",
+      "kind": "EXACT_GEOMETRIC_COUNTEREXAMPLE",
+      "url": "/dynamics-lab/dynamic-proof/dpr-003/",
+      "result": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-003/DPR-003_RESULTS.json",
+        "sha256": "64373419d1bb8e559c1793cbb540d4a32611b085c1006df45ad8910c60c822b4"
+      },
+      "manifest": {
+        "url": "/dynamics-lab/dynamic-proof/dpr-003/DPR-003_MANIFEST.json",
+        "sha256": "8617a13342fa1b9e39a950f97fc92fce009e0b5444e7a0ed92205bbf29872aaf"
+      }
+    }
+  ],
+  "verifier": {
+    "url": "/dynamics-lab/dynamic-proof/verify-dynamic-proof.py.txt",
+    "sha256": "d2cc53e0da4c4fed7a629c18b8488121d46e7ad6768f97282d85845d6e5fa530"
+  }
+}

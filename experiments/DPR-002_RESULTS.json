@@ -1,0 +1,71 @@
+{
+  "id": "DPR-002",
+  "evidence": "EXACT_REFERENCE_REPRODUCTION_AND_CERTIFIED_INTERVAL",
+  "completed_at": "2026-11-09T22:11:38.523363+00:00",
+  "volume": "pi/3",
+  "integral": "(pi/3)*(R+1/R)",
+  "integral_condition": "R > 0 in the one-circle zero-mode model",
+  "radius": "3/2",
+  "dual_radius": "2/3",
+  "height": "1/10",
+  "coefficient_of_pi": "13/18",
+  "constant_term": {
+    "precision_bits": 128,
+    "terms_per_series": 72,
+    "direct": {
+      "engine": "FLINT/Arb",
+      "precision_bits": 128,
+      "ball": "[1.850440051566366674285997981541375956 +/- 7.68e-37]",
+      "absolute_radius": "[4.4552632051863657297007388200218830431e-37 +/- 4.67e-75]",
+      "lower_dyadic": [
+        "314836060296153337885104076906039212035",
+        -127
+      ],
+      "upper_dyadic": [
+        "314836060296153337885104076906039212187",
+        -127
+      ]
+    },
+    "poisson": {
+      "engine": "FLINT/Arb",
+      "precision_bits": 128,
+      "ball": "[1.8504400515663666742859979815413759557 +/- 4.78e-38]",
+      "absolute_radius": "[2.8499298130152897722669870389780011384e-38 +/- 3.40e-77]",
+      "lower_dyadic": [
+        "314836060296153337885104076906039212113",
+        -127
+      ],
+      "upper_dyadic": [
+        "314836060296153337885104076906039212123",
+        -127
+      ]
+    },
+    "intersection": {
+      "engine": "FLINT/Arb",
+      "precision_bits": 128,
+      "ball": "[1.8504400515663666742859979815413759557 +/- 4.87e-38]",
+      "absolute_radius": "[2.9387358814347764709368946896922691423e-38 +/- 2.77e-76]",
+      "lower_dyadic": [
+        "19677253768509583617819004806627450757",
+        -123
+      ],
+      "upper_dyadic": [
+        "78709015074038334471276019226509803031",
+        -125
+      ]
+    }
+  },
+  "scope": "One compact free boson, genus one. The interval is for one radius and height.",
+  "sources": [
+    {
+      "title": "Angelantonj, Cardella, Elitzur and Rabinovici (2011)",
+      "locator": "§3.2",
+      "url": "https://arxiv.org/html/1012.5091v2#S3.SS2"
+    },
+    {
+      "title": "Cacciatori and Cardella (2010)",
+      "locator": "Modular volume and equidistribution",
+      "url": "https://arxiv.org/abs/1007.3717v3"
+    }
+  ]
+}

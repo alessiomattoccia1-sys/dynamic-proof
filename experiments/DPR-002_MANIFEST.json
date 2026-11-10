@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "DPR-002",
+  "engine": "Dynamic Proof Research Engine",
+  "evidence": "EXACT_REFERENCE_REPRODUCTION_AND_CERTIFIED_INTERVAL",
+  "report": "/dynamics-lab/dynamic-proof/dpr-002/",
+  "result": {
+    "url": "/dynamics-lab/dynamic-proof/dpr-002/DPR-002_RESULTS.json",
+    "sha256": "0ae3b0130e1e7e8718ef9392058402a7a9f05fab88bcaf0429e0d6758fd5cbf3"
+  },
+  "verifier": {
+    "url": "/dynamics-lab/dynamic-proof/verify-dynamic-proof.py.txt",
+    "sha256": "d2cc53e0da4c4fed7a629c18b8488121d46e7ad6768f97282d85845d6e5fa530"
+  },
+  "scope": "One compact free boson, genus one. The interval is for one radius and height.",
+  "sources": [
+    {
+      "title": "Angelantonj, Cardella, Elitzur and Rabinovici (2011)",
+      "locator": "§3.2",
+      "url": "https://arxiv.org/html/1012.5091v2#S3.SS2"
+    },
+    {
+      "title": "Cacciatori and Cardella (2010)",
+      "locator": "Modular volume and equidistribution",
+      "url": "https://arxiv.org/abs/1007.3717v3"
+    }
+  ]
+}

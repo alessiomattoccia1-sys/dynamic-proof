@@ -1,0 +1,114 @@
+"""Recompute the public Dynamic Proof experiments with Python and python-flint.
+
+Download DPR-001_RESULTS.json, DPR-002_RESULTS.json, DPR-003_RESULTS.json
+and this file to the same directory. Run in an environment with
+python-flint==0.8.0: python3 verify-dynamic-proof.py.txt
+The reports describe the analytic deductions and scope of each result.
+"""
+
+from fractions import Fraction
+import json
+from math import isqrt, lcm
+from pathlib import Path
+
+from flint import arb, ctx
+
+
+def require(condition, description):
+    if not condition:
+        raise ValueError(description)
+
+
+def dyadic(pair):
+    mantissa, exponent = pair
+    return arb(int(mantissa)) * arb(2)**exponent
+
+
+def enclosed(value, certificate):
+    return value.lower() >= dyadic(certificate["lower_dyadic"]) and value.upper() <= dyadic(certificate["upper_dyadic"])
+
+
+def divisor_sum(n):
+    total = 0
+    for divisor in range(1, isqrt(n) + 1):
+        quotient, remainder = divmod(n, divisor)
+        if remainder == 0:
+            total += divisor
+            if quotient != divisor:
+                total += quotient
+    return total
+
+
+def robin(data):
+    points = [data["boundary"], *data["verified_points"]]
+    require([item["n"] for item in points] == list(range(5040, 5101)), "Robin range")
+    for item in points:
+        n = item["n"]
+        sigma = divisor_sum(n)
+        require(item["sigma"] == sigma, f"divisor sum at {n}")
+        margin = arb(n) * arb.const_euler().exp() * arb(n).log().log() - sigma
+        require(enclosed(margin, item), f"Robin enclosure at {n}")
+        sign = margin < 0 if n == 5040 else margin > 0
+        require(sign, f"Robin sign at {n}")
+    factors = {"choie": [[2, 1]], "hertlein1": [[2, 20]], "hertlein2": [[3, 13], [5, 8], [7, 7], [11, 6]]}
+    require(data["complement_factors"] == factors, "theorem thresholds")
+    modulus = lcm(*(p**power for group in factors.values() for p, power in group))
+    require(str(modulus) == data["residual_modulus"], "Robin residual modulus")
+
+
+def gaussian(alpha, count):
+    partial = sum(((-alpha * k*k).exp() for k in range(1, count + 1)), arb(0))
+    remainder = (-alpha * (count + 1)**2).exp() / (1 - (-alpha * (2*count + 3)).exp())
+    return partial + arb(0).union(remainder.upper())
+
+
+def torus(data):
+    radius = Fraction(data["radius"])
+    dual = Fraction(data["dual_radius"])
+    height = Fraction(data["height"])
+    require(radius > 0 and height > 0 and radius * dual == 1, "torus domain and inversion")
+    require((radius + dual)/3 == Fraction(data["coefficient_of_pi"]), "coefficient of pi")
+    pi = arb.pi()
+    require((2*(arb(1)/2).asin()).overlaps(pi/3), "genus-one volume")
+    r = arb(radius.numerator)/radius.denominator
+    y = arb(height.numerator)/height.denominator
+    square = r*r
+    count = data["constant_term"]["terms_per_series"] + 8
+    direct = y.sqrt() * (1 + 2*(gaussian(pi*y/square, count) + gaussian(pi*y*square, count)))
+    poisson = r + 1/r - y.sqrt() + 2*(r*gaussian(pi*square/y, count) + gaussian(pi/(square*y), count)/r)
+    require(direct.overlaps(poisson), "overlap of direct and Poisson forms")
+    require(enclosed(direct, data["constant_term"]["direct"]), "direct enclosure")
+    require(enclosed(poisson, data["constant_term"]["poisson"]), "Poisson enclosure")
+    require(enclosed(direct.intersection(poisson), data["constant_term"]["intersection"]), "intersection enclosure")
+
+
+def geometry(data):
+    x = Fraction(data["point_x"])
+    require(x > -1 and data["metrics"] == ["diag(1,1)", "diag(1+x,1)"], "metric domain")
+    weights = [Fraction(w) for w in data["weights"]]
+    require(weights == [Fraction(1, 2)]*2, "equal weights")
+    metric_values = (1, 1+x)
+    derivatives = (0, 1)
+    mean_metric = sum(w*value for w, value in zip(weights, metric_values))
+    derivative = sum(w*value for w, value in zip(weights, derivatives))
+    left = derivative / (2*mean_metric)
+    right = sum(w*Fraction(d, 2*value) for w, d, value in zip(weights, derivatives, metric_values))
+    require(left == Fraction(data["connection_of_mean"]), "connection of mean")
+    require(right == Fraction(data["mean_of_connections"]), "mean of connections")
+    difference = left - right
+    require(difference == Fraction(data["difference"]) != 0, "exact counterexample")
+
+
+def main():
+    base = Path(__file__).resolve().parent
+    with ctx.workprec(192):
+        for i, check in enumerate((robin, torus, geometry), 1):
+            identifier = f"DPR-{i:03}"
+            data = json.loads((base / f"{identifier}_RESULTS.json").read_text(encoding="utf-8"))
+            require(data["id"] == identifier, "report identifier")
+            check(data)
+            print(f"{identifier} OK")
+
+
+if __name__ == "__main__":
+    main()
