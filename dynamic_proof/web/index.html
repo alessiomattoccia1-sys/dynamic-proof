@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Copyright 2026 Alessio Mattoccia -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,39 +16,39 @@
     <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><path d="M5 6h8a8 8 0 1 1 0 16H5zM9 10h4a4 4 0 0 1 0 8H9z" stroke="currentColor" stroke-width="1.6"/><circle cx="23" cy="6" r="2" fill="currentColor"/></svg></div>
     <div><strong>Dynamic Proof</strong><span>Dynamic Labs · Research Engine</span></div>
   </div>
-  <nav aria-label="Sezioni"><a href="#laboratori">Laboratori</a><a href="#registro">Registro</a><a href="#cronologia">Cronologia</a></nav>
-  <div class="control" aria-label="Comandi ricerca">
-    <button type="button" data-mode="paused" id="pause">Pausa</button>
-    <button type="button" data-mode="running" id="resume">Riprendi</button>
-    <button type="button" data-mode="stopped" id="stop" class="stop">Arresta</button>
+  <nav aria-label="Sections"><a href="#laboratori">Labs</a><a href="#registro">Registry</a><a href="#cronologia">History</a></nav>
+  <div class="control" aria-label="Research controls">
+    <button type="button" data-mode="paused" id="pause">Pause</button>
+    <button type="button" data-mode="running" id="resume">Resume</button>
+    <button type="button" data-mode="stopped" id="stop" class="stop">Stop</button>
   </div>
 </header>
 
 <main class="layout">
   <section class="intro" aria-labelledby="intro-title">
     <div>
-      <p class="eyebrow">CONSOLE DI RICERCA · REGISTRO LOCALE</p>
-      <h1 id="intro-title">Ricerca deduttiva</h1>
-      <p class="lede">Consulta esperimenti, ipotesi e verifiche dei laboratori Dynamic Proof.</p>
+      <p class="eyebrow">RESEARCH CONSOLE · LOCAL REGISTRY</p>
+      <h1 id="intro-title">Deductive research</h1>
+      <p class="lede">Explore experiments, hypotheses, and verification results from the Dynamic Proof labs.</p>
     </div>
-    <div class="connection" aria-live="polite"><span class="indicator" id="runner-dot"></span><div><strong id="runner-status">Connessione al Core</strong><span id="runner-note">Lettura del registro…</span></div></div>
+    <div class="connection" aria-live="polite"><span class="indicator" id="runner-dot"></span><div><strong id="runner-status">Connecting to the core</strong><span id="runner-note">Reading the registry…</span></div></div>
   </section>
 
   <div id="notice" class="notice" hidden role="status"></div>
 
-  <section class="stats" aria-label="Riepilogo">
-    <div class="metric"><span>Laboratori</span><strong id="count-labs">—</strong><small>Code di ricerca indipendenti</small></div>
-    <div class="metric"><span>Tentativi conclusi</span><strong id="count-runs">—</strong><small>Inclusi gli esiti negativi</small></div>
-    <div class="metric"><span>Risultati controllati</span><strong id="count-verified">—</strong><small>Prove, certificati e controesempi</small></div>
-    <div class="metric"><span>Candidati originali</span><strong id="count-original">—</strong><small>Solo classificazione C</small></div>
+  <section class="stats" aria-label="Summary">
+    <div class="metric"><span>Labs</span><strong id="count-labs">—</strong><small>Independent research queues</small></div>
+    <div class="metric"><span>Completed attempts</span><strong id="count-runs">—</strong><small>Includes negative outcomes</small></div>
+    <div class="metric"><span>Verified results</span><strong id="count-verified">—</strong><small>Proofs, certificates, and counterexamples</small></div>
+    <div class="metric"><span>Original candidates</span><strong id="count-original">—</strong><small>Level C only</small></div>
   </section>
 
   <section id="laboratori" class="section">
-    <div class="section-head"><h2>Laboratori</h2><span id="active-label" class="pill neutral">In lettura</span></div>
+    <div class="section-head"><h2>Labs</h2><span id="active-label" class="pill neutral">Loading</span></div>
     <div id="labs" class="labs"></div>
     <div class="operating">
-      <div class="panel"><h3>Esperimento in corso</h3><p id="active-run" class="muted">Lettura della coda…</p><p id="active-detail" class="small muted"></p></div>
-      <div class="panel"><h3>Risorse e verificatori</h3><p id="limits" class="muted">Lettura dei limiti…</p><p id="consumption" class="small muted"></p></div>
+      <div class="panel"><h3>Active experiment</h3><p id="active-run" class="muted">Reading the queue…</p><p id="active-detail" class="small muted"></p></div>
+      <div class="panel"><h3>Resources and verifiers</h3><p id="limits" class="muted">Reading resource limits…</p><p id="consumption" class="small muted"></p></div>
     </div>
   </section>
 
@@ -56,39 +56,39 @@
     <div class="section-head"><h2>Particle Theory</h2><span id="particle-active" class="pill neutral"></span></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th scope="col">Problema</th><th scope="col">Esito</th><th scope="col">Unità esaminate</th><th scope="col">Classi</th><th scope="col">Escluse</th><th scope="col">Letteratura</th><th scope="col">Evidenza</th></tr></thead>
+        <thead><tr><th scope="col">Problem</th><th scope="col">Outcome</th><th scope="col">Units examined</th><th scope="col">Classes</th><th scope="col">Excluded</th><th scope="col">Literature</th><th scope="col">Evidence</th></tr></thead>
         <tbody id="particle-runs"></tbody>
       </table>
     </div>
   </section>
 
   <section id="coverage" class="section" hidden>
-    <div class="section-head"><div><p class="eyebrow">02 / RIDUZIONE</p><h2>Dominio residuo di Robin</h2></div><span class="pill amber">Conseguenza condizionale</span></div>
+    <div class="section-head"><div><p class="eyebrow">02 / REDUCTION</p><h2>Remaining domain for Robin's inequality</h2></div><span class="pill amber">Conditional consequence</span></div>
     <div class="coverage panel">
-      <div><h3>Risultati applicati</h3><div id="coverage-choices" class="choices"></div></div>
-      <div class="coverage-result"><h3>Enunciato residuo</h3><p id="coverage-formula" class="math" aria-live="polite"></p><p class="small muted">Il residuo dipende dai risultati selezionati.</p><details id="coverage-trace"><summary>Mostra i passaggi della deduzione</summary><ol id="coverage-steps"></ol></details></div>
+      <div><h3>Applied results</h3><div id="coverage-choices" class="choices"></div></div>
+      <div class="coverage-result"><h3>Remaining statement</h3><p id="coverage-formula" class="math" aria-live="polite"></p><p class="small muted">The remaining domain depends on the selected results.</p><details id="coverage-trace"><summary>Show the deduction steps</summary><ol id="coverage-steps"></ol></details></div>
     </div>
   </section>
 
   <section id="registro" class="section">
-    <div class="section-head"><div><p class="eyebrow">03 / EVIDENZE</p><h2>Registro scientifico</h2></div><span id="result-count" class="pill neutral"></span></div>
+    <div class="section-head"><div><p class="eyebrow">03 / EVIDENCE</p><h2>Scientific registry</h2></div><span id="result-count" class="pill neutral"></span></div>
     <div class="filters">
-      <label>Laboratorio<select id="lab-filter"><option value="">Tutti i laboratori</option></select></label>
-      <label>Classe di evidenza<select id="kind-filter"><option value="">Tutte le classi</option></select></label>
-      <label class="search">Cerca<input id="search-filter" type="search" placeholder="Titolo, formula o fonte"></label>
+      <label>Lab<select id="lab-filter"><option value="">All labs</option></select></label>
+      <label>Evidence class<select id="kind-filter"><option value="">All classes</option></select></label>
+      <label class="search">Search<input id="search-filter" type="search" placeholder="Title, formula, or source"></label>
     </div>
     <div id="claim-list" class="claim-list" aria-live="polite"></div>
   </section>
 
   <section id="cronologia" class="section">
-    <div class="section-head"><div><p class="eyebrow">04 / MEMORIA</p><h2>Cronologia dei cicli</h2></div><span class="pill neutral">Checkpoint SQLite</span></div>
-    <div class="table-wrap"><table><thead><tr><th scope="col">Tentativo</th><th scope="col">Laboratorio</th><th scope="col">Strategia</th><th scope="col">Esito</th><th scope="col">Durata</th><th scope="col">Rapporto</th></tr></thead><tbody id="runs"></tbody></table></div>
-    <details class="panel audit"><summary>Ultimi eventi di audit</summary><ol id="events"></ol></details>
+    <div class="section-head"><div><p class="eyebrow">04 / HISTORY</p><h2>Cycle history</h2></div><span class="pill neutral">SQLite checkpoints</span></div>
+    <div class="table-wrap"><table><thead><tr><th scope="col">Attempt</th><th scope="col">Lab</th><th scope="col">Strategy</th><th scope="col">Outcome</th><th scope="col">Duration</th><th scope="col">Report</th></tr></thead><tbody id="runs"></tbody></table></div>
+    <details class="panel audit"><summary>Recent audit events</summary><ol id="events"></ol></details>
   </section>
 </main>
 
 <dialog id="claim-dialog" aria-labelledby="dialog-title">
-  <div class="dialog-head"><div><p class="eyebrow">SCHEDA SCIENTIFICA</p><h2 id="dialog-title"></h2></div><button id="close-dialog" type="button" aria-label="Chiudi scheda">×</button></div>
+  <div class="dialog-head"><div><p class="eyebrow">RESULT DETAILS</p><h2 id="dialog-title"></h2></div><button id="close-dialog" type="button" aria-label="Close result details">×</button></div>
   <div id="dialog-content"></div>
 </dialog>
 </body>

@@ -91,14 +91,14 @@ BUDGET_CAPS = {
 
 def _integer(value, lower, upper, name):
     if type(value) is not int or not lower <= value <= upper:
-        raise ValueError(f"{name} richiede un intero fra {lower} e {upper}")
+        raise ValueError(f"{name} requires an integer between {lower} and {upper}")
     return value
 
 
 def _flag(raw, name, default):
     value = raw.get(name, default)
     if type(value) is not bool:
-        raise ValueError(f"{name} richiede un booleano")
+        raise ValueError(f"{name} requires a boolean")
     return value
 
 
@@ -108,68 +108,68 @@ def read_problem(raw: dict) -> dict:
             "strict_chirality", "primitive", "scalar_charges", "max_scalars", "mass_condition",
             "method", "theorem", "budget", "completeness", "references"}
     if not isinstance(raw, dict) or raw.keys() - keys:
-        raise ValueError("problema Particle Theory con campi sconosciuti")
+        raise ValueError("Particle Theory problem contains unknown fields")
     name, title, mode = raw.get("id"), raw.get("title"), raw.get("type")
     if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,47}", name):
-        raise ValueError("identificativo problema non valido")
+        raise ValueError("invalid problem identifier")
     if not isinstance(title, str) or not 1 <= len(title.strip()) <= 140 or "\n" in title:
-        raise ValueError("titolo problema non valido")
+        raise ValueError("invalid problem title")
     if mode not in ("classification", "construction", "counterexample", "proof"):
-        raise ValueError("tipo di ricerca non supportato")
+        raise ValueError("unsupported search type")
     size = _integer(raw.get("fermions"), 1, 10, "fermions")
     bound = _integer(raw.get("charge_bound"), 1, 32, "charge_bound")
     fixed = raw.get("fermion_charges")
     if fixed is not None:
         if not isinstance(fixed, list) or len(fixed) != size:
-            raise ValueError("fermion_charges deve contenere esattamente fermions elementi")
+            raise ValueError("fermion_charges must have exactly fermions entries")
         fixed = sorted(_integer(q, -bound, bound, "carica fermionica") for q in fixed)
         if 0 in fixed:
-            raise ValueError("le cariche fermioniche sono non nulle")
+            raise ValueError("fermion charges must be nonzero")
         fixed = list(canonical_charges(fixed))
     anomalies = raw.get("anomalies", ["linear", "cubic"])
     if not isinstance(anomalies, list) or any(a not in ("linear", "cubic") for a in anomalies):
-        raise ValueError("anomalies accetta linear e cubic")
+        raise ValueError("anomalies accepts linear and cubic")
     anomalies = sorted(set(anomalies))
     method = raw.get("method", "quadratic" if len(anomalies) == 2 and size >= 2 else "enumeration")
     if method not in ("enumeration", "quadratic") or (method == "quadratic" and
                                                        (len(anomalies) != 2 or size < 2)):
-        raise ValueError("quadratic richiede almeno due fermioni e le due equazioni di anomalia")
+        raise ValueError("quadratic requires at least two fermions and both anomaly equations")
     scalar = raw.get("scalar_charges")
     if scalar is not None:
         if not isinstance(scalar, list) or len(scalar) > 64:
-            raise ValueError("scalar_charges deve essere una lista di al massimo 64 elementi")
+            raise ValueError("scalar_charges must be a list of at most 64 entries")
         scalar = sorted({abs(_integer(h, -64, 64, "carica scalare")) for h in scalar})
         if 0 in scalar:
-            raise ValueError("le cariche scalari sono non nulle")
+            raise ValueError("scalar charges must be nonzero")
     max_scalars = _integer(raw.get("max_scalars", 0), 0, size, "max_scalars")
     mass = raw.get("mass_condition", "any")
     if mass not in ("any", "full_rank"):
-        raise ValueError("mass_condition accetta any e full_rank")
+        raise ValueError("mass_condition accepts any and full_rank")
     theorem = raw.get("theorem")
     if mode == "proof":
         theorems = ("odd_scalar_valuation", "two_scalar_labels", "one_scalar_multiple_four")
         if theorem not in theorems or fixed is not None:
-            raise ValueError("specificare un teorema universale supportato, senza cariche fermioniche fissate")
+            raise ValueError("specify a supported universal theorem without fixed fermion charges")
         if theorem == "odd_scalar_valuation" and size % 2 == 0:
-            raise ValueError("fermions dev'essere dispari per la ricerca di controesempi al teorema")
+            raise ValueError("fermions must be odd for the theorem's counterexample search")
         if theorem == "one_scalar_multiple_four" and size % 4 == 0:
-            raise ValueError("fermions dev'essere fuori da 4ℕ per la ricerca di controesempi al teorema")
+            raise ValueError("fermions must lie outside 4ℕ for the theorem's counterexample search")
     elif theorem is not None:
-        raise ValueError("theorem si applica ai problemi di dimostrazione")
+        raise ValueError("theorem applies to proof problems")
     if mode == "counterexample" and (not scalar or len(scalar) != max_scalars or mass != "any"):
-        raise ValueError("la confutazione della sufficienza aritmetica richiede un insieme scalare fissato")
+        raise ValueError("a counterexample to arithmetic sufficiency requires a fixed scalar set")
     completeness = raw.get("completeness", "witness" if mode in ("construction", "counterexample") else "exhaustive")
     if (completeness not in ("exhaustive", "witness")
             or (mode in ("classification", "proof") and completeness != "exhaustive")
             or (mode == "counterexample" and completeness != "witness")):
-        raise ValueError("criterio di completezza incompatibile col tipo di ricerca")
+        raise ValueError("completeness criterion is incompatible with the search type")
     references = raw.get("references", [GENERAL, FEW])
     allowed = {s.id for s in SOURCES}
     if not isinstance(references, list) or any(not isinstance(s, str) or s not in allowed for s in references):
-        raise ValueError("usare identificativi bibliografici del catalogo Particle Theory")
+        raise ValueError("use reference identifiers from the Particle Theory catalogue")
     budget = raw.get("budget", {})
     if not isinstance(budget, dict) or budget.keys() - DEFAULT_BUDGET.keys():
-        raise ValueError("budget Particle Theory con campi sconosciuti")
+        raise ValueError("Particle Theory budget contains unknown fields")
     budget = {key: _integer(budget.get(key, value), 1, BUDGET_CAPS[key], key)
               for key, value in DEFAULT_BUDGET.items()}
     return {
@@ -313,7 +313,7 @@ def smt_models(problem):
         multiplicities = {q: model.eval(m).as_long() for q, m in count.items()}
         charges = tuple(q for q in values for _ in range(multiplicities[q]))
         if len(charges) != problem["fermions"] or _reject(charges, problem):
-            raise ValueError("modello SMT incompatibile con la verifica esatta")
+            raise ValueError("SMT model conflicts with exact verification")
         rows.append(charges)
         solver.add(z3.Or([m != multiplicities[q] for q, m in count.items()]))
     return {"method": "Z3 QF_LIA sulle molteplicità", "version": z3.get_version_string(),
@@ -326,10 +326,10 @@ def independent_scan(problem, expected):
     smt = smt_models(problem)
     if smt["complete"]:
         if set(smt["models"]) != set(expected):
-            raise ValueError("classificazione Z3 ed enumerazione discordanti")
+            raise ValueError("Z3 classification and enumeration disagree")
         return {"verified": True, "smt": smt, "method": smt["method"]}
     if not set(smt["models"]) <= set(expected):
-        raise ValueError("Z3 ha trovato un modello assente dall'enumerazione")
+        raise ValueError("Z3 found a model missing from the enumeration")
     pool = _pool(problem["charge_bound"])
     n = problem["fermions"]
     linear = "linear" in problem["anomalies"]
@@ -355,7 +355,7 @@ def independent_scan(problem, expected):
             continue
         rows.add(row)
     if rows != set(expected):
-        raise ValueError("le due classificazioni intere sono discordanti")
+        raise ValueError("the two integer classifications disagree")
     # With only the cubic equation a second direct scan has the same search
     # space. Its witness checks are distinct, but it is not a second solver.
     return {"verified": bool(linear and not fixed), "smt": smt,
@@ -399,7 +399,7 @@ def matching_certificate(neighbors):
     rows = set(range(len(neighbors))) - reached
     if (len(rows) + len(columns) != len(by_row)
             or any(i not in rows and j not in columns for i, entries in enumerate(neighbors) for j in entries)):
-        raise ValueError("certificato di copertura bipartita non valido")
+        raise ValueError("invalid bipartite cover certificate")
     return by_row, {"rows": sorted(rows), "columns": sorted(columns)}
 
 
@@ -460,11 +460,11 @@ def mass_certificate(charges, scalars):
     size = len(charges)
     witness = _mass_witness(size, matching)
     if any(value and j not in neighbors[i] for i, row in enumerate(witness) for j, value in enumerate(row)):
-        raise ValueError("testimone con entrata vietata")
+        raise ValueError("witness contains a forbidden entry")
     rank, determinant = exact_rank(witness)
     evaluated = sp.Matrix(witness)
     if rank != len(matching) or rank != evaluated.rank() or determinant != evaluated.det():
-        raise ValueError("rango, copertura e testimone razionale non coincidono")
+        raise ValueError("rank, cover, and rational witness disagree")
     base_symbols = {(0, 3): "a", (0, 4): "b", (1, 3): "c", (2, 2): "d"}
     matrix = sp.zeros(size)
     entries = []
@@ -487,7 +487,7 @@ def mass_certificate(charges, scalars):
         polynomial = sp.factor(matrix.det(method="domain-ge"))
         values = {matrix[i, j]: witness[i][j] for i in range(size) for j in neighbors[i]}
         if polynomial.subs(values) != determinant:
-            raise ValueError("il polinomio del determinante non riproduce il testimone")
+            raise ValueError("the determinant polynomial does not reproduce the witness")
         symbolic = str(polynomial)
         symbolic_status = "expanded_exact"
     else:
@@ -653,7 +653,7 @@ def _single_scalar_probe(problem, *, exclude_both_fixed_charges=False):
                 return {"prefixes": examined, "prefixes_total": total, "supports": supports, "complete": False}
             matching, _ = matching_certificate(support(charges, (h,)))
             if len(matching) == n:
-                raise ValueError(f"controesempio imprevisto alla parità: {charges}, {h}")
+                raise ValueError(f"unexpected counterexample to parity: {charges}, {h}")
             supports += 1
     return {"prefixes": examined, "prefixes_total": total, "supports": supports, "complete": examined == total}
 
@@ -750,7 +750,7 @@ def _proof(context, problem, followups):
         problem["budget"]["verification_steps"],
     ):
         if (signed_sum_witness(size, (a, b)) is not None) != two_scalar_allowed(size, a, b):
-            raise ValueError(f"controesempio imprevisto all'equivalenza aritmetica: {size}, {a}, {b}")
+            raise ValueError(f"unexpected counterexample to the arithmetic equivalence: {size}, {a}, {b}")
         tested += 1
     proof = (
         "Si scriva a'=a/g e b'=b/g, g=MCD(a,b). Le differenze dei conteggi con segno "
@@ -853,7 +853,7 @@ def _counterexample(problem, models, detail, followups):
         if len(matching) == len(charges):
             continue
         if sum(labels) != 2 * sum(charges) or any(abs(label) not in scalars for label in labels):
-            raise ValueError("relazione aritmetica non valida")
+            raise ValueError("invalid arithmetic relation")
         found = {"charges": charges, "signed_scalar_labels": labels, "mass": mass_certificate(charges, scalars)}
         break
     detail["counterexample_search"] = {"tested_orbits": tested, "complete": found is None and tested == len(models)}
@@ -960,7 +960,7 @@ def run_problem(context: Context, payload: dict) -> Result:
         file = context.root / "experiments" / "particle" / f"{example}.json"
         problem = read_problem(json.loads(file.read_text(encoding="utf-8")))
     else:
-        raise ValueError("problema Particle Theory sconosciuto")
+        raise ValueError("unknown Particle Theory problem")
     followups = _next_example(example)
     if problem["type"] == "proof":
         return _proof(context, problem, followups)
@@ -994,7 +994,7 @@ def run_problem(context: Context, payload: dict) -> Result:
 
 LAB = Lab(
     ID, "Particle Theory",
-    "Anomalie U(1), cariche chirali e rango delle masse Yukawa con verifiche intere e simboliche.",
+    "U(1) anomalies, chiral charges, and Yukawa mass rank with exact integer and symbolic checks.",
     SOURCES, CLAIMS, {"problem": run_problem}, (Work("problem", {"example": PROGRAM[0]}, 70),),
     submit=submit,
 )

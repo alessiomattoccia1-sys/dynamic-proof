@@ -43,7 +43,7 @@ class Expr:
     @classmethod
     def read(cls, value: list) -> Expr:
         if not isinstance(value, list) or not value or not isinstance(value[0], str):
-            raise ValueError("espressione non valida")
+            raise ValueError("invalid expression")
         return cls(value[0], tuple(cls.read(x) if isinstance(x, list) else x for x in value[1:]))
 
     def __str__(self) -> str:
@@ -130,7 +130,7 @@ def _type_of(value: Expr, names: dict[str, str]) -> str:
     if op == "var" and len(args) == 1 and isinstance(args[0], str) and args[0] in names:
         return names[args[0]]
     if any(not isinstance(arg, Expr) for arg in args):
-        raise ValueError(f"argomenti non validi per {op}")
+        raise ValueError(f"invalid arguments for {op}")
     types = [_type_of(arg, names) for arg in args]
     if op in ("and", "or", "not") and types and set(types) == {"bool"}:
         if op != "not" or len(types) == 1:
@@ -142,9 +142,9 @@ def _type_of(value: Expr, names: dict[str, str]) -> str:
         return "bool"
     if op in ("add", "sub", "mul", "div", "pow") and len(types) == 2 and numeric:
         if op == "pow" and (args[1].op != "num" or types[1] != "int" or int(args[1].args[0]) not in range(65)):
-            raise ValueError("sono supportate potenze intere da 0 a 64")
+            raise ValueError("integer powers from 0 to 64 are supported")
         return "real" if "real" in types or op == "div" else "int"
-    raise ValueError(f"operatore o tipi incompatibili: {op} {types}")
+    raise ValueError(f"incompatible operator or operand types: {op} {types}")
 
 
 @dataclass(frozen=True)
@@ -155,9 +155,9 @@ class Binder:
 
     def __post_init__(self) -> None:
         if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", self.name):
-            raise ValueError("nome di variabile non valido")
+            raise ValueError("invalid variable name")
         if self.sort not in {"int", "real", "symbolic"} or self.quantifier not in {"forall", "exists"}:
-            raise ValueError("tipo o quantificatore non supportato")
+            raise ValueError("unsupported type or quantifier")
 
 
 @dataclass(frozen=True)
@@ -170,9 +170,9 @@ class Statement:
     def __post_init__(self) -> None:
         names = {b.name: b.sort for b in self.binders}
         if len(names) != len(self.binders):
-            raise ValueError("variabili duplicate")
+            raise ValueError("duplicate variables")
         if any(_type_of(part, names) != "bool" for part in (self.domain, *self.hypotheses, self.conclusion)):
-            raise ValueError("dominio, ipotesi e conclusione devono essere proposizioni")
+            raise ValueError("domain, assumptions, and conclusion must be propositions")
 
     @property
     def scope(self) -> Expr:

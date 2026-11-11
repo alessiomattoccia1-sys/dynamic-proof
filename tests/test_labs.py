@@ -71,7 +71,7 @@ class ScientificRegression(unittest.TestCase):
         with TemporaryDirectory() as temp:
             file = Path(temp) / "Bad.lean"
             file.write_text("theorem bad : False := by sorry\n")
-            with self.assertRaisesRegex(ValueError, "vietati"):
+            with self.assertRaisesRegex(ValueError, "forbidden"):
                 verify_lean(ROOT / ".tools/lean/bin/lean", file, {"bad": "False"}, cwd=ROOT)
             file.write_text("theorem one : 1 = 1 := rfl\n")
             wrong = verify_lean(ROOT / ".tools/lean/bin/lean", file, {"one": "1 = 2"}, cwd=ROOT)

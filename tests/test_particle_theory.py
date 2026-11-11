@@ -179,8 +179,8 @@ class ParticleQueueTests(unittest.TestCase):
             self.assertTrue(any(c["lab"] == "riemann" and c["status"] == "queued"
                                 for c in store.snapshot()["counts"]))
             file = str(ROOT / "experiments/particle/PT-006.json")
-            self.assertIn("in coda", invoke("submit", pt.ID, file))
-            self.assertIn("già registrato", invoke("submit", pt.ID, file))
+            self.assertIn("queued", invoke("submit", pt.ID, file))
+            self.assertIn("already registered", invoke("submit", pt.ID, file))
             invoke("run", "--lab", pt.ID, "--cycles", "1")
             refuted = [claim for claim in store.snapshot()["claims"] if claim["refuted_by"]]
             self.assertTrue(any(claim["lab"] == pt.ID for claim in refuted))

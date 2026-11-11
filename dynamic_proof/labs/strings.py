@@ -298,8 +298,8 @@ def ramanujan_projection(context: Context, payload: dict) -> Result:
                   proof_complete=True, independent=True)
 
 
-LAB = Lab("strings", "Teoria delle stringhe",
-          "Worldsheet, misure modulari, Rankin–Selberg, funzioni di partizione e ipotesi spettrali.",
+LAB = Lab("strings", "String Theory",
+          "Worldsheets, modular measures, Rankin–Selberg, partition functions, and spectral hypotheses.",
           SOURCES, CLAIMS, {"modular_volume": modular_volume, "theta_reference": theta_reference,
                            "theta_dual": theta_dual, "coefficient_gap": coefficient_gap,
                            "graded_spectrum": graded_spectrum, "ramanujan_projection": ramanujan_projection,

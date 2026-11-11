@@ -315,8 +315,8 @@ def rankin_bridge(context: Context, _payload: dict) -> Result:
                   proof_complete=True, independent=True)
 
 
-LAB = Lab("riemann", "Riemann e teoria dei numeri",
-          "Criterio di Robin, zeri della zeta, riduzioni su famiglie di interi e priorità analitiche.",
+LAB = Lab("riemann", "Riemann and number theory",
+          "Robin’s criterion, zeta zeros, reductions over families of integers, and analytic priorities.",
           SOURCES, CLAIMS, {"robin_interval": robin_range, "zeta_zeros": zeta_zeros,
                            "robin_reduce": robin_reduce, "factor_support": factor_support,
                            "large_robin_search": large_robin_search, "robin_arithmetic_proof": robin_arithmetic_proof,

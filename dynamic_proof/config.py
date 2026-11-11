@@ -23,9 +23,9 @@ class ResearchConfig:
         for field, (lower, upper) in bounds.items():
             value = getattr(self, field)
             if type(value) is not int or not lower <= value <= upper:
-                raise ValueError(f"{field} fuori dall’intervallo {lower}–{upper}")
+                raise ValueError(f"{field} outside the range {lower}–{upper}")
         if type(self.online_literature) is not bool or type(self.continue_after_candidate) is not bool:
-            raise ValueError("i controlli della ricerca richiedono valori booleani")
+            raise ValueError("research controls require boolean values")
 
 
 def read_config(path: Path) -> tuple[ResearchConfig, int]:
@@ -34,5 +34,5 @@ def read_config(path: Path) -> tuple[ResearchConfig, int]:
     research = ResearchConfig(**data.get("research", {}))
     port = data.get("dashboard", {}).get("port", 8789)
     if type(port) is not int or not 1024 <= port <= 65535:
-        raise ValueError("porta non valida")
+        raise ValueError("invalid port")
     return research, port

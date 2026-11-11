@@ -51,7 +51,7 @@ class LogicTests(unittest.TestCase):
         self.assertEqual(reduced.dependencies, ("p",))
         wrong = Claim("p2", "a", "wrong", Statement(B, TRUE, (), e("lt", X, num(0))),
                       Kind.EXACT, evidence={"usable_for_coverage": True})
-        with self.assertRaisesRegex(ValueError, "incompatibili"):
+        with self.assertRaisesRegex(ValueError, "incompatible"):
             residual(target, [wrong])
 
     def test_exhaustive_certificate_only_covers_declared_interval(self):

@@ -176,8 +176,8 @@ def variable_action(context: Context, _payload: dict) -> Result:
                   proof_complete=True, independent=True)
 
 
-LAB = Lab("tmf", "TMF · Geometria multiscala",
-          "Controlli matematici su metriche medie, connessioni e azione a scala finita.",
+LAB = Lab("tmf", "TMF · Multiscale geometry",
+          "Mathematical checks of averaged metrics, connections, and finite-scale actions.",
           SOURCES, CLAIMS, {"mono_scale": mono_scale, "mean_connection": mean_connection,
                            "weighted_identity": weighted_identity, "variable_action": variable_action},
           (Work("mono_scale", {}, 100), Work("mean_connection", {}, 98)))

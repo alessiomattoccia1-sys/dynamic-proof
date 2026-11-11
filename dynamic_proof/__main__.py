@@ -32,24 +32,24 @@ def main():
     parser.add_argument("--state", type=Path, default=ROOT / "state")
     parser.add_argument("--config", type=Path, default=ROOT / "config.toml")
     commands = parser.add_subparsers(dest="command", required=True)
-    initialize = commands.add_parser("init", help="registra fonti, enunciati e attività iniziali")
-    run = commands.add_parser("run", help="ricerca persistente senza interfaccia")
-    run.add_argument("--cycles", type=int, help="limite di tentativi in questa esecuzione")
-    serve = commands.add_parser("serve", help="dashboard e ricerca persistente")
+    initialize = commands.add_parser("init", help="register sources, statements, and initial jobs")
+    run = commands.add_parser("run", help="run persistent research from the command line")
+    run.add_argument("--cycles", type=int, help="maximum attempts in this run")
+    serve = commands.add_parser("serve", help="serve the dashboard and run persistent research")
     serve.add_argument("--port", type=int)
     for command in (initialize, run, serve):
-        command.add_argument("--lab", choices=tuple(BY_ID), help="limita il comando a un laboratorio")
-    commands.add_parser("status", help="stato JSON del registro")
-    queue = commands.add_parser("queue", help="accoda un nuovo enunciato strutturato")
+        command.add_argument("--lab", choices=tuple(BY_ID), help="limit the command to one laboratory")
+    commands.add_parser("status", help="show registry status as JSON")
+    queue = commands.add_parser("queue", help="queue a new structured statement")
     queue.add_argument("lab", choices=tuple(lab.id for lab in LABS))
     queue.add_argument("file", type=Path)
-    submit = commands.add_parser("submit", help="accoda un problema JSON specialistico")
+    submit = commands.add_parser("submit", help="queue a lab-specific JSON problem")
     submit.add_argument("lab", choices=tuple(lab.id for lab in LABS if lab.submit))
     submit.add_argument("file", type=Path)
-    transfer = commands.add_parser("transfer", help="trasferisce un risultato con lo stesso dominio e le stesse ipotesi")
+    transfer = commands.add_parser("transfer", help="transfer a result with the same domain and assumptions")
     transfer.add_argument("claim")
     transfer.add_argument("lab", choices=tuple(lab.id for lab in LABS))
-    entail = commands.add_parser("deduce", help="verifica una conseguenza di premesse registrate nel frammento SMT")
+    entail = commands.add_parser("deduce", help="check whether registered premises entail a statement in the SMT fragment")
     entail.add_argument("target")
     entail.add_argument("premises", nargs="+")
     control = commands.add_parser("control")
@@ -68,50 +68,50 @@ def main():
     selected_labs = (BY_ID[selected],) if selected else LABS
     store.register(ROOT, selected_labs)
     if args.command == "init":
-        print(f"Registro inizializzato · {store.path}")
+        print(f"Registry initialized · {store.path}")
         return 0
     if args.command == "submit":
         try:
             if args.file.stat().st_size > 64 * 1024:
-                raise ValueError("file troppo grande")
+                raise ValueError("file is too large")
             problem = json.loads(args.file.read_text(encoding="utf-8"))
             added = store.enqueue(args.lab, BY_ID[args.lab].submit(problem).data())
         except (ValueError, KeyError, TypeError, RecursionError, OSError) as error:
             parser.error(str(error))
-        print(f"{problem['id']} · {'in coda' if added else 'già registrato'}")
+        print(f"{problem['id']} · {'queued' if added else 'already registered'}")
         return 0
     if args.command == "queue":
         try:
             if args.file.stat().st_size > 64 * 1024:
-                raise ValueError("file troppo grande")
+                raise ValueError("file is too large")
             raw = json.loads(args.file.read_text(encoding="utf-8"))
             statement = Statement.read(raw["statement"])
             title = raw["title"]
             if not isinstance(title, str) or not 1 <= len(title.strip()) <= 140:
-                raise ValueError("titolo non valido")
+                raise ValueError("invalid title")
             if len(statement.binders) > 12 or len(statement.hypotheses) > 16:
-                raise ValueError("enunciato troppo ampio per una singola ricerca")
+                raise ValueError("statement is too large for a single search")
             if type(raw.get("relax", False)) is not bool:
-                raise ValueError("relax deve essere booleano")
+                raise ValueError("relax must be a boolean")
             proposal = Claim("input." + digest([args.lab, statement.fingerprint()])[:20], args.lab, title,
-                             statement, Kind.CONJECTURE, evidence={"origin": "input strutturato"})
+                             statement, Kind.CONJECTURE, evidence={"origin": "structured input"})
             added = store.queue_claim(proposal, Work("@statement", {"statement": statement.data(), "title": title,
                                          "parent": proposal.id, "relax": raw.get("relax", False)}, 92).data())
         except (ValueError, KeyError, TypeError, RecursionError, OSError) as error:
             parser.error(str(error))
-        print(f"{proposal.id} · {'in coda' if added else 'già registrato'}")
+        print(f"{proposal.id} · {'queued' if added else 'already registered'}")
         return 0
     if args.command == "transfer":
         source = store.claim(args.claim)
         if (not source or source["quarantine"] or source["refuted_by"]
                 or Kind(source["kind"]) not in {Kind.FORMAL, Kind.EXACT, Kind.LITERATURE, Kind.CONDITIONAL}):
-            parser.error("risultato assente o inadatto al riuso")
+            parser.error("result is missing or ineligible for reuse")
         original = Claim.read(source)
         if original.lab == args.lab:
-            parser.error("selezionare un laboratorio diverso")
+            parser.error("select a different laboratory")
         imported = Claim(f"transfer.{args.lab}.{original.id}", args.lab, original.title, original.statement,
                          Kind.CONDITIONAL, original.sources, (original.id,),
-                         {"rule": "trasferimento con identici dominio, quantificatori e ipotesi",
+                         {"rule": "transfer with identical domain, quantifiers, and assumptions",
                           "usable_for_coverage": bool(original.evidence.get("usable_for_coverage"))})
         store.add_claim(imported)
         print(imported.id)
@@ -119,7 +119,7 @@ def main():
     if args.command == "deduce":
         rows = [store.claim(identifier) for identifier in [args.target, *args.premises]]
         if any(not row or row["quarantine"] or row["refuted_by"] for row in rows):
-            parser.error("enunciato assente o in revisione")
+            parser.error("statement is missing or under review")
         target, *premises = map(Claim.read, rows)
         try:
             trace = deduce(target.statement, premises)
@@ -135,15 +135,15 @@ def main():
     runner = Runner(ROOT, store, config, QUERIES)
     if args.command == "run":
         if args.cycles is not None and args.cycles < 1:
-            parser.error("--cycles deve essere positivo")
+            parser.error("--cycles must be positive")
         for sig in (signal.SIGTERM, signal.SIGINT):
             signal.signal(sig, lambda *_: runner.stop.set())
         completed = runner.run(args.cycles, lab=selected)
-        print(f"Tentativi terminati · {completed}")
+        print(f"Attempts completed · {completed}")
         return 0
 
     if args.port is not None and not 1024 <= args.port <= 65535:
-        parser.error("--port deve essere compresa tra 1024 e 65535")
+        parser.error("--port must be between 1024 and 65535")
     http = make_server(store, selected_labs, config, args.port or port)
     failed = []
 
@@ -152,7 +152,7 @@ def main():
             runner.run(lab=selected)
         except Exception as error:
             failed.append(error)
-            print(f"Orchestratore interrotto · {error}", flush=True)
+            print(f"Orchestrator stopped · {error}", flush=True)
             http.shutdown()
 
     def shutdown(*_args):

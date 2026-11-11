@@ -1,26 +1,26 @@
-# Risultati del primo programma Particle Theory
+# Results of the first Particle Theory programme
 
-Mac mini, 10–11 novembre 2026. Il Runner ha concluso 20 tentativi, inclusi i checkpoint, su un budget di 30. PT-001–PT-010 sono partiti dalla coda iniziale. Il risultato di PT-010 ha motivato PT-011 e PT-012, sottoposti nello stesso registro. L'esecuzione successiva ha trovato la coda esaurita.
+Mac mini, 10–11 November 2026. The runner completed 20 attempts, including checkpoints, out of a budget of 30. PT-001–PT-010 came from the initial queue. PT-010 prompted PT-011 and PT-012, submitted to the same registry. The subsequent run found the queue exhausted.
 
-| Problema | Esito verificato |
+| Problem | Verified outcome |
 | --- | --- |
-| PT-001 | 26.334 multinsiemi. Due assegnazioni orientate, una classe primitiva per segno globale. L'enumerazione e Z3 coincidono. |
-| PT-002 | Tutti i dieci supporti a uno scalare sono singolari per il modello di riferimento. Il minimo è due. Con \(h=(1,2)\) si ottiene rango 5, determinante \(b^2c^2d\) e un testimone di determinante 1. |
-| PT-003 | Lean verifica il caso dispari a uno scalare e la versione dei multipli dispari di un intero comune. La ricerca finita ha esaminato 1.365 prefissi e 1.174 supporti a uno scalare. |
-| PT-004 | Sei classi primitive chirali con \(n=6\), \(|q_i|\le12\), su 17.550 prefissi ordinati. |
-| PT-005 | Due classi prive di anomalie locali con \(n=5\), \(|q_i|\le14\). Una ammette rango 5 nel pool di scalari 1–6 e con al più due scalari. È la classe del pilot, con coppie \((1,2)\) e \((2,3)\). |
-| PT-006 | Il modello del pilot con \(h=(3,6)\) ha la somma di etichette \(6+3+3-6-6=0\), ma il rango generico è 4. Il controesempio confuta la sufficienza aritmetica nel registro. |
-| PT-007 | Per \(n\) dispari il criterio aritmetico a due scalari è \((a+b)/\gcd(a,b)\) dispari e al più \(n\). Derivazione e 330 confronti esatti con programmazione dinamica. |
-| PT-008 | UNSAT nel dominio a quattro fermioni, \(|q_i|\le9\), dopo 5.985 multinsiemi e verifica Z3. |
-| PT-009 | 22 classi primitive chirali con \(n=7\), \(|q_i|\le12\), su 98.280 prefissi ordinati. |
-| PT-010 | Nessuna delle sei classi di PT-004 raggiunge rango 6 con un solo scalare. Il massimo rango di ciascuna è 4 nel dominio esaminato. |
-| PT-011 | Due dimostrazioni analitiche di \(4\mid n\) quando un solo scalare dà massa piena, \(\sum q_i=0\) e almeno uno dei punti fissi \(h/2,-h/2\) è assente. Il controllo finito ha esaminato 2.002 prefissi e 1.056 supporti a sei fermioni. |
-| PT-012 | \(q=(-7,-6,-3,1,1,2,4,8)\), \(h=5\). Entrambe le somme di anomalia sono zero. Il supporto ammette rango 8 e un testimone intero di determinante 1. |
+| PT-001 | 26,334 multisets. Two oriented assignments, one primitive class modulo global sign. Enumeration and Z3 agree. |
+| PT-002 | All ten one-scalar supports are singular for the reference model. The minimum is two. For \(h=(1,2)\), the generic rank is 5, the determinant is \(b^2c^2d\), and an explicit witness has determinant 1. |
+| PT-003 | Lean verifies the odd one-scalar case and the version for odd multiples of a common integer. The finite search examined 1,365 prefixes and 1,174 one-scalar supports. |
+| PT-004 | Six primitive chiral classes for \(n=6\), \(\lvert q_i\rvert\le12\), across 17,550 ordered prefixes. |
+| PT-005 | Two locally anomaly-free classes for \(n=5\), \(\lvert q_i\rvert\le14\). One admits rank 5 with at most two scalars from the pool 1–6. It is the pilot class, with pairs \((1,2)\) and \((2,3)\). |
+| PT-006 | For the pilot model with \(h=(3,6)\), the label sum \(6+3+3-6-6\) is zero, yet the generic rank is 4. This refutes sufficiency of the arithmetic condition. |
+| PT-007 | For odd \(n\), the two-scalar arithmetic criterion is that \((a+b)/\gcd(a,b)\) be odd and at most \(n\). Analytic derivation and 330 exact dynamic-programming comparisons. |
+| PT-008 | UNSAT for four fermions with \(\lvert q_i\rvert\le9\), after 5,985 multisets and a Z3 cross-check. |
+| PT-009 | 22 primitive chiral classes for \(n=7\), \(\lvert q_i\rvert\le12\), across 98,280 ordered prefixes. |
+| PT-010 | None of the six PT-004 classes reaches rank 6 with one scalar. Each has maximum rank 4 within the search domain. |
+| PT-011 | Two analytic proofs of \(4\mid n\) when one scalar gives full mass rank, \(\sum q_i=0\), and at least one of the fixed points \(h/2,-h/2\) is absent. The finite check examined 2,002 prefixes and 1,056 six-fermion supports. |
+| PT-012 | \(q=(-7,-6,-3,1,1,2,4,8)\), \(h=5\). Both anomaly sums vanish. The support admits rank 8 and an integer witness of determinant 1. |
 
-## Soglia a otto fermioni
+## Eight-fermion threshold
 
-Il teorema PT-011 dà un limite inferiore di otto nel settore chirale con le due anomalie cancellate, usando il minimo generale di cinque fermioni della letteratura. La costruzione PT-012 raggiunge il limite con un solo scalare. Il fascicolo riporta la dimostrazione tramite il grafo delle cariche, quella tramite le molteplicità e il caso \(n=2\) che mostra il ruolo dell'ipotesi sui punti fissi. La formalizzazione Lean di PT-011 e la verifica di priorità bibliografica sono aperte. [Metodo e dimostrazioni](SCIENTIFIC_METHOD.md) · [Costa, Dobrescu e Fox 2020](https://doi.org/10.1103/PhysRevD.101.095032)
+PT-011 gives a lower bound of eight in the chiral sector with both anomalies cancelled, using the published general minimum of five fermions. PT-012 attains the bound with a single scalar. The dossier records the charge-graph proof, the multiplicity proof, and the \(n=2\) example that shows why the fixed-point assumption matters. Lean formalization of PT-011 and the priority check remain open. [Method and proofs](SCIENTIFIC_METHOD.md) · [Costa, Dobrescu, and Fox (2020)](https://doi.org/10.1103/PhysRevD.101.095032)
 
-Il registro ha classificato PT-011 e PT-012 come nuovi per la sessione. Per PT-011 sono disponibili le risposte di Crossref, arXiv e INSPIRE-HEP e il confronto con le fonti primarie. La ricerca mirata sulla soglia con masse Majorana ammesse resta aperta. [Confronto bibliografico](PRIOR_ART.md)
+The registry classified PT-011 and PT-012 as new to the session. For PT-011, it records Crossref, arXiv, and INSPIRE-HEP responses and comparison with primary sources. The targeted search for the threshold allowing Majorana masses remains open. [Prior-art comparison](PRIOR_ART.md)
 
-I fascicoli locali sono in `.local/particle-research/reports/`. I tentativi 5, 11 e 19 contengono le bozze LaTeX. Il tentativo 20 contiene matrice, polinomio simbolico e testimone del modello a otto fermioni. [Istruzioni per riprodurre e riprendere](REPRODUCIBILITY.md)
+The reproducibility commands write dossiers under the selected state directory's `reports/`. In the first run, attempts 5, 11, and 19 contained LaTeX drafts. Attempt 20 recorded the eight-fermion matrix, symbolic polynomial, and witness. [Reproduction and resumption](REPRODUCIBILITY.md)

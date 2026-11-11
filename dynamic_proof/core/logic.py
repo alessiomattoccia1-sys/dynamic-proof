@@ -27,7 +27,7 @@ def evaluate(expr: Expr, values: dict[str, Fraction]) -> bool | Fraction:
     if op == "false":
         return False
     if op == "opaque":
-        raise ValueError("formula esterna senza valutatore eseguibile")
+        raise ValueError("external formula has no executable evaluator")
     if op == "and":
         return all(evaluate(arg, values) for arg in args)
     if op == "or":
@@ -63,7 +63,7 @@ def z3_expression(expr: Expr, symbols: dict):
     if op in ("true", "false"):
         return z3.BoolVal(op == "true")
     if op == "opaque":
-        raise ValueError("formula esterna senza traduzione SMT")
+        raise ValueError("external formula has no SMT translation")
     terms = [z3_expression(arg, symbols) for arg in args]
     if op in {"and", "or", "not"}:
         return {"and": z3.And, "or": z3.Or, "not": z3.Not}[op](*terms)
@@ -74,7 +74,7 @@ def z3_expression(expr: Expr, symbols: dict):
         # SMT gives division by zero a total interpretation. Accept only known
         # nonzero literal divisors so an undefined term cannot prove a claim.
         if args[1].op != "num" or Fraction(args[1].args[0]) == 0:
-            raise ValueError("divisione SMT con denominatore non costante e non nullo")
+            raise ValueError("SMT division requires a nonzero constant denominator")
         if z3.is_int(left):
             left = z3.ToReal(left)
     if op == "pow":
@@ -167,7 +167,7 @@ def usable_for_coverage(claim: Claim) -> bool:
 def residual(target: Statement, proven: list[Claim]) -> Coverage:
     """Restrict a universal claim by the actual guarded domains of admissible results."""
     if not target.universal:
-        raise ValueError("la copertura richiede un obiettivo universale")
+        raise ValueError("coverage requires a universal target")
     target_parts = set(_conjuncts(target.scope))
     parts = []
     steps = []
@@ -175,9 +175,9 @@ def residual(target: Statement, proven: list[Claim]) -> Coverage:
     for claim in proven:
         statement = claim.statement
         if not usable_for_coverage(claim):
-            raise ValueError(f"{claim.id}: evidenza incompatibile con una riduzione")
+            raise ValueError(f"{claim.id}: evidence is incompatible with reduction")
         if statement.binders != target.binders or statement.conclusion != target.conclusion:
-            raise ValueError(f"{claim.id}: conclusione o dominio dei quantificatori incompatibili")
+            raise ValueError(f"{claim.id}: incompatible conclusion or quantifier domain")
         relative_scope = conjunction(*(item for item in _conjuncts(statement.scope) if item not in target_parts))
         excluded = negate(relative_scope)
         parts.extend(_conjuncts(excluded))
@@ -196,9 +196,9 @@ def deduce(target: Statement, premises: list[Claim], timeout_ms: int = 1200) -> 
     eligible = {Kind.FORMAL, Kind.EXACT, Kind.LITERATURE, Kind.CONDITIONAL}
     if not premises or any(claim.kind not in eligible or not (claim.evidence or {}).get("usable_for_coverage")
                            or claim.statement.binders != target.binders for claim in premises):
-        raise ValueError("premessa priva di evidenza adeguata o quantificatori incompatibili")
+        raise ValueError("premise lacks sufficient evidence or has incompatible quantifiers")
     if not target.universal or any(b.sort == "symbolic" for b in target.binders):
-        raise ValueError("deduzione fuori dal frammento universale SMT")
+        raise ValueError("deduction is outside the universal SMT fragment")
     symbols = {b.name: (z3.Int if b.sort == "int" else z3.Real)(b.name) for b in target.binders}
     solver = z3.Solver()
     solver.set(timeout=timeout_ms)

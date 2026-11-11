@@ -83,17 +83,17 @@ def make_server(store, labs, config, port):
                 self._json(200, store.sources())
             elif path.startswith("/api/claim/"):
                 found = store.claim(unquote(path.removeprefix("/api/claim/")))
-                self._json(200, found) if found else self._json(404, {"error": "enunciato assente"})
+                self._json(200, found) if found else self._json(404, {"error": "statement not found"})
             elif path.startswith("/api/artifact/"):
                 key = path.removeprefix("/api/artifact/")
                 found = store.artifact(key) if re.fullmatch(r"[a-f0-9]{64}", key) else None
-                self._json(200, found) if found else self._json(404, {"error": "artefatto assente"})
+                self._json(200, found) if found else self._json(404, {"error": "artifact not found"})
             elif path.startswith("/api/report/"):
                 self._report(path.removeprefix("/api/report/"))
             elif path.startswith("/api/coverage/"):
                 self._coverage(path.removeprefix("/api/coverage/"), parse_qs(request.query, keep_blank_values=True))
             else:
-                self._json(404, {"error": "risorsa non trovata"})
+                self._json(404, {"error": "resource not found"})
 
         def _report(self, filename):
             if re.fullmatch(r"[0-9]{6,}\.(md|json|tex)", filename):
@@ -103,18 +103,18 @@ def make_server(store, labs, config, port):
                     mime += "; charset=utf-8"
                     self._reply(200, file.read_bytes(), mime, f'attachment; filename="dynamic-proof-{filename}"')
                     return
-            self._json(404, {"error": "rapporto assente"})
+            self._json(404, {"error": "report not found"})
 
         def _coverage(self, lab_id, query):
             lab = modules.get(lab_id)
             if not lab or not lab.coverage_target:
-                self._json(404, {"error": "riduzione non configurata"})
+                self._json(404, {"error": "reduction is not configured"})
                 return
             identifiers = query.get("include", list(lab.coverage_options))
             identifiers = list(dict.fromkeys(item for item in identifiers if item))
             options = self._options(lab, store.snapshot()["claims"])
             if any(item not in options for item in identifiers):
-                self._json(422, {"error": "risultato incompatibile con il dominio di copertura"})
+                self._json(422, {"error": "result is incompatible with the coverage domain"})
                 return
             try:
                 target = Claim.read(store.claim(lab.coverage_target))
@@ -122,7 +122,7 @@ def make_server(store, labs, config, port):
                 for identifier in identifiers:
                     data = store.claim(identifier)
                     if not data or data.get("quarantine") or data.get("refuted_by"):
-                        raise ValueError(f"premessa in revisione: {identifier}")
+                        raise ValueError(f"premise under review: {identifier}")
                     premises.append(Claim.read(data))
                 self._json(200, residual(target.statement, premises).data())
             except (TypeError, ValueError, KeyError) as error:
@@ -152,19 +152,19 @@ def make_server(store, labs, config, port):
             if (not self._allowed_host()
                     or self.headers.get("Origin", "") not in {f"http://127.0.0.1:{port}", f"http://localhost:{port}"}
                     or not secrets.compare_digest(self.headers.get("X-Research-Token", ""), token)):
-                self._json(403, {"error": "controllo locale non autorizzato"})
+                self._json(403, {"error": "local control request is unauthorized"})
                 return
             if self.path != "/api/control":
-                self._json(404, {"error": "risorsa non trovata"})
+                self._json(404, {"error": "resource not found"})
                 return
             try:
                 size = int(self.headers.get("Content-Length", "0"))
                 if not 0 < size < 1024:
-                    raise ValueError("richiesta non valida")
+                    raise ValueError("invalid request")
                 data = json.loads(self.rfile.read(size))
                 store.control(data["mode"])
             except (ValueError, KeyError, TypeError):
-                self._json(422, {"error": "comando di controllo non valido"})
+                self._json(422, {"error": "invalid control command"})
                 return
             self._json(200, {"mode": data["mode"]})
 

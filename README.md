@@ -1,23 +1,23 @@
 # Dynamic Proof Research Engine
 
-Progetto di **Alessio Mattoccia**.
+Created by **Alessio Mattoccia**.
 
-**Dynamics Lab · Engine 03 · v0.1.0**
+**Dynamics Lab · Engine 03 · v0.2.0**
 
-Motore locale di ricerca deduttiva con registro SQLite, orchestratore persistente e dashboard. Registra domini, ipotesi, provenienza e dipendenze. Combina calcolo simbolico, intervalli certificati, ricerca di controesempi e verifiche formali opzionali.
+Dynamic Proof runs local deductive research with a persistent scheduler, a SQLite registry, and a dashboard. It records domains, assumptions, provenance, and dependencies. It combines symbolic computation, certified interval arithmetic, counterexample searches, and optional formal verification.
 
-| Laboratorio | Esperimenti inclusi |
+| Laboratory | Included experiments |
 | --- | --- |
-| Riemann e teoria dei numeri | Criterio di Robin, riduzione per divisibilità, controlli finiti con Arb e zeri indicizzati della zeta. |
-| Teoria delle stringhe | Integrale toroidale di genere uno, dualità T, termine costante e proiezioni modulari. |
-| TMF · Geometria multiscala | Connessioni di Levi-Civita, controesempio DPR-003, riduzione monoscala e azioni con pesi variabili. |
-| Particle Theory | Anomalie locali U(1), equivalenze chirali, rango delle masse Yukawa e teorema di parità in Lean. [Guida](docs/particle_theory/README.md) |
+| Riemann and number theory | Robin's criterion, divisibility reductions, finite Arb checks, and indexed zeta zeros. |
+| String Theory | Genus-one toroidal integral, T-duality, constant terms, and modular projections. |
+| TMF · Multiscale geometry | Levi-Civita connections, the DPR-003 counterexample, single-scale reduction, and variable-weight actions. |
+| Particle Theory | Local U(1) anomalies, chiral equivalence, Yukawa mass rank, and a Lean-verified parity theorem. [Particle Theory manual](docs/particle_theory/README.md) |
 
-La TMF è trattata come teoria candidata. Le verifiche di Robin sono riferite ai domini dei singoli rapporti. L’ipotesi di Riemann resta aperta. [Pagina del motore e rapporti](https://mattoccia.com/dynamics-lab/dynamic-proof/) · [Clay Mathematics Institute](https://www.claymath.org/millennium/riemann-hypothesis/)
+TMF is a candidate theory. Each Robin report specifies its verification domain. The Riemann hypothesis remains open. [Engine page and reports](https://mattoccia.com/dynamics-lab/dynamic-proof/) · [Clay Mathematics Institute](https://www.claymath.org/millennium/riemann-hypothesis/)
 
-## Avvio
+## Getting started
 
-Ambiente verificato su macOS Apple Silicon con Python 3.12. Esegui questi comandi dalla cartella estratta o dal checkout.
+The qualified environment is macOS on Apple Silicon with Python 3.12. Run the commands from the extracted archive or checkout.
 
 ~~~sh
 python3.12 -m venv .venv
@@ -25,7 +25,7 @@ python3.12 -m venv .venv
 .venv/bin/python -m dynamic_proof serve
 ~~~
 
-Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore crea `state/`, registra i quattro laboratori e comincia i calcoli. `Ctrl+C` interrompe il processo. La ripresa usa lo stesso registro.
+Open the [local dashboard](http://127.0.0.1:8791/). On first start, the engine creates `state/`, registers the four labs, and begins running jobs. Press `Ctrl+C` to exit. Subsequent runs resume from the same registry.
 
 ~~~sh
 .venv/bin/python -m dynamic_proof status
@@ -34,7 +34,7 @@ Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore cre
 .venv/bin/python -m dynamic_proof control stopped
 ~~~
 
-`config.toml` controlla il budget per esperimento, la cadenza, la porta e le ricerche bibliografiche. La configurazione distribuita usa il catalogo locale. `online_literature = true` abilita interrogazioni pubbliche su arXiv, Crossref e INSPIRE-HEP con i termini dei laboratori. Per avviare un registro separato, usa `--state` prima del sottocomando.
+`config.toml` controls per-experiment budgets, scheduling, the dashboard port, and literature search. The distributed configuration uses the local catalogue. Set `online_literature = true` to query arXiv, Crossref, and INSPIRE-HEP with the lab's search terms. Pass `--state` before the subcommand to use a separate registry.
 
 ~~~sh
 .venv/bin/python -m dynamic_proof --state .work/demo run --cycles 8
@@ -43,24 +43,24 @@ Apri la [dashboard locale](http://127.0.0.1:8791/). Al primo avvio il motore cre
 .venv/bin/python -m dynamic_proof --state .local/particle-research run --lab particle_theory --cycles 30
 ~~~
 
-Il comando `queue` accetta enunciati strutturati. Nel frammento lineare intero il motore usa SMT per cercare controesempi e, con Lean configurato, tenta la verifica formale. La modalità `relax` propone varianti che rimuovono un’ipotesi per volta. Su macOS è disponibile il servizio facoltativo `.venv/bin/python scripts/macos_service.py install`, con log nel registro della copia che lo installa.
+The `queue` command accepts structured statements. In the linear integer fragment, the engine searches for counterexamples with SMT and attempts formal verification when Lean is configured. The optional `relax` field requests variants that remove one assumption at a time. On macOS, install the optional login service with `.venv/bin/python scripts/macos_service.py install`. The service writes logs to the state directory of the copy that installed it.
 
-`init`, `run` e `serve` accettano `--lab` per selezionare una coda. Il comando `submit particle_theory FILE.json` accoda un problema specialistico nello stesso Runner. [Schema e comandi Particle Theory](docs/particle_theory/README.md)
+Use `--lab` with `init`, `run`, or `serve` to select a queue. Use `submit particle_theory FILE.json` to submit a specialist problem to the same runner. [Particle Theory schema and commands](docs/particle_theory/README.md)
 
-## Riproduzione e test
+## Reproduction and tests
 
-L’archivio include i dati pubblici DPR-001, DPR-002 e DPR-003, i manifest con SHA-256 e lo script di replay. I file corrispondono alle versioni distribuite dal sito. [Indice pubblico degli esperimenti](https://mattoccia.com/dynamics-lab/dynamic-proof/PUBLIC_EXPORT.json)
+The archive includes the public DPR-001, DPR-002, and DPR-003 data, SHA-256 manifests, and the replay script. [Public experiment index](https://mattoccia.com/dynamics-lab/dynamic-proof/PUBLIC_EXPORT.json)
 
 ~~~sh
 .venv/bin/python experiments/verify-dynamic-proof.py.txt
 .venv/bin/python -m unittest discover -s tests -v
 ~~~
 
-Il primo comando ricalcola i tre risultati dal pacchetto. La suite esercita il nucleo, le verifiche scientifiche, la dashboard e il recupero dopo interruzione. I test specifici di Lean si attivano quando è presente la toolchain.
+The first command recomputes the three results. The test suite covers the core, scientific verifiers, dashboard endpoints, and recovery after interruption. Lean tests run when the toolchain is available.
 
-### Verifica formale opzionale
+### Optional formal verification
 
-Posiziona Lean **4.33.1** con `bin/lean` e `bin/lake` in `.tools/lean` oppure collega lì la cartella della distribuzione ufficiale. Da `proofs/` carica le dipendenze fissate nel manifest.
+Place Lean **4.33.1**, with `bin/lean` and `bin/lake`, in `.tools/lean` or link the official distribution there. From `proofs/`, load the pinned dependencies.
 
 ~~~sh
 cd proofs
@@ -69,8 +69,8 @@ cd ..
 .venv/bin/python -m unittest discover -s tests -v
 ~~~
 
-Il kernel controlla i tipi attesi e gli assiomi delle dichiarazioni. Il rapporto distingue le identità formalizzate dalle prove analitiche, dai risultati riportati nelle fonti e dalle verifiche numeriche. [Distribuzione ufficiale di Lean 4.33.1](https://github.com/leanprover/lean4/releases/tag/v4.33.1)
+The kernel checks the expected types and axioms of the declarations. The reports identify the evidence for each claim, including formal identities, analytic arguments, published results, and numerical checks. [Official Lean 4.33.1 distribution](https://github.com/leanprover/lean4/releases/tag/v4.33.1)
 
-## Licenza
+## License
 
-I sorgenti originali e i materiali di riproduzione inclusi sono distribuiti sotto **Apache License 2.0**. Le dipendenze si installano separatamente e mantengono le loro licenze. Le fonti scientifiche sono citate nei rispettivi rapporti. [LICENSE](LICENSE) · [NOTICE](NOTICE) · [Licenze delle dipendenze](THIRD_PARTY_NOTICES.md)
+The original source code and included reproduction materials are distributed under the **Apache License 2.0**. Dependencies are installed separately and retain their own licenses. The experiment reports cite the scientific sources. [LICENSE](LICENSE) · [NOTICE](NOTICE) · [Third-party notices](THIRD_PARTY_NOTICES.md)

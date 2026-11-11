@@ -32,12 +32,12 @@ def verify_owner():
     if PLIST.is_file():
         current = plistlib.loads(PLIST.read_bytes())
         if current.get("WorkingDirectory") != str(ROOT):
-            raise RuntimeError("l’identificativo launchd appartiene a un’altra directory")
+            raise RuntimeError("the launchd identifier belongs to a different directory")
 
 
 def install():
     if not PROGRAM.is_file():
-        raise RuntimeError("ambiente Python di progetto assente")
+        raise RuntimeError("project Python environment is missing")
     verify_owner()
     STATE.mkdir(mode=0o700, exist_ok=True)
     PLIST.parent.mkdir(mode=0o700, exist_ok=True)
@@ -67,7 +67,7 @@ def main():
     parser.add_argument("action", choices=("install", "status", "remove", "restart"))
     action = parser.parse_args().action
     if sys.platform != "darwin":
-        parser.error("questo servizio usa macOS launchd")
+        parser.error("this service requires macOS launchd")
     if action == "install":
         install()
     elif action == "status":

@@ -17,7 +17,7 @@ from .model import Expr
 
 def ball_data(value: arb, precision: int) -> dict:
     if not value.is_finite():
-        raise ValueError("intervallo Arb non finito")
+        raise ValueError("non-finite Arb interval")
     with ctx.workprec(precision):
         lower, upper = value.lower().man_exp(), value.upper().man_exp()
         return {"engine": "FLINT/Arb", "precision_bits": precision, "ball": str(value),
@@ -51,7 +51,7 @@ def rational_identity(left: Expr, right: Expr, variables: tuple[str, ...]) -> di
     not assert that the hypotheses of a geometric or physical model imply that.
     """
     if len(set(variables)) != len(variables):
-        raise ValueError("variabili duplicate")
+        raise ValueError("duplicate variables")
     zero = (0,) * len(variables)
     one = {zero: Fraction(1)}
     symbolic = {name: sp.Symbol(name) for name in variables}
@@ -66,14 +66,14 @@ def rational_identity(left: Expr, right: Expr, variables: tuple[str, ...]) -> di
             index = variables.index(args[0])
             return symbolic[args[0]], {tuple(int(i == index) for i in range(len(variables))): Fraction(1)}, one
         if op not in ("add", "sub", "mul", "div", "pow") or len(args) != 2:
-            raise ValueError("termine non razionale")
+            raise ValueError("non-rational term")
         sa, an, ad = convert(args[0])
         if op == "pow":
             if args[1].op != "num":
-                raise ValueError("esponente non costante")
+                raise ValueError("nonconstant exponent")
             exponent = Fraction(args[1].args[0])
             if exponent.denominator != 1 or not 0 <= exponent <= 64:
-                raise ValueError("esponente non supportato")
+                raise ValueError("unsupported exponent")
             numerator, denominator = one, one
             for _ in range(int(exponent)):
                 numerator, denominator = _mul(numerator, an), _mul(denominator, ad)
@@ -81,7 +81,7 @@ def rational_identity(left: Expr, right: Expr, variables: tuple[str, ...]) -> di
         sb, bn, bd = convert(args[1])
         if op == "div":
             if not bn:
-                raise ValueError("denominatore identicamente nullo")
+                raise ValueError("identically zero denominator")
             if args[1].op != "num":
                 denominators.add(args[1])
             return sa / sb, _mul(an, bd), _mul(ad, bn)
@@ -112,11 +112,11 @@ def verify_lean(lean: Path, proof: Path, expectations: dict[str, str],
     if not lean.is_file():
         return {"valid": False, "status": "unavailable", "reason": "toolchain Lean assente"}
     if not expectations or any(not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", name) for name in expectations):
-        raise ValueError("dichiarazioni Lean non valide")
+        raise ValueError("invalid Lean declarations")
     source = proof.read_text(encoding="utf-8")
     if re.search(r"\b(sorry|admit|axiom|unsafe|native_decide|implemented_by|run_cmd|elab|macro)\b|set_option|#eval",
                  source):
-        raise ValueError("il sorgente Lean contiene costrutti vietati")
+        raise ValueError("the Lean source contains forbidden constructs")
     checkers = []
     for index, (name, expected_type) in enumerate(expectations.items()):
         checkers.extend([f"theorem dp_check_{index} : {expected_type} := {name}",
