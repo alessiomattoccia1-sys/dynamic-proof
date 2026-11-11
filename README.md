@@ -2,7 +2,7 @@
 
 Created by **Alessio Mattoccia**.
 
-**Dynamics Lab · Engine 03 · v0.2.0**
+**Dynamics Lab · Engine 03 · v0.2.1**
 
 Dynamic Proof runs local deductive research with a persistent scheduler, a SQLite registry, and a dashboard. It records domains, assumptions, provenance, and dependencies. It combines symbolic computation, certified interval arithmetic, counterexample searches, and optional formal verification.
 
